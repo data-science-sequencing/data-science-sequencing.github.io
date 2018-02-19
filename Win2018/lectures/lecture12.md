@@ -21,8 +21,11 @@ examine how we can solve it optimally under some simplicity assumptions.
 1.	<a href='#intro'>RNA-Seq quantification</a>
     -	<a href='#naive'>A naive approach</a>
 1.	<a href='#improvement'>Improved approach: Iterative estimation refinement</a>
-    - <a href='#algo'>General Algorithm</a>
-    - <a href='#questions'>Questions</a>
+    - <a href='#algo'>General Algorithm for the case of equal length transcripts</a>
+        - <a href='#eg1'>A concrete example</a>
+    - <a href='#algo2'>General Algorithm for the case of different length transcripts</a>
+        - <a href='#eg2'>A concrete example</a>
+1. <a href='#goodness'>How to decide if an algorithm is good?</a>
 
 ### <a id='intro'></a>RNA-Seq quantification
 
@@ -93,11 +96,11 @@ But now, we can simply repeat the process using the updated estimate of the abun
 
 This seems promising. So, let's formulate this algorithm more generally.
 
-#### <a id='algo'></a>General Algorithm
+#### <a id='algo'></a>General Algorithm for Sequences of Same Length
 
 
 1. Since we know nothing about the abundances to begin with, our initial estimate is uniform.  That is  
-\\[\hat{\rho}_k^{(0)}=\frac{1}{K},k=1,2,...,K\\]
+\\[\hat{\rho}_k^{(1)}=\frac{1}{K},k=1,2,...,K\\]
 
 
 2. For step $$m=1,2,...$$ repeat:  
@@ -113,6 +116,194 @@ $$
 $$
 \hat{\rho}_k^{(m+1)}=\frac{1}{N}\sum_{i=1}^{N}{f_{ik}^{(m)}}
 $$
+
+##### <a id='eg1'></a>A Concrete Example
+
+Let there exist two transcripts $$t_1$$ and
+$$t_2$$ of abundances $$\rho_1 =1 \ $$ and $$ \rho_2 =0 \ $$
+as shown below, where there are three exons
+A, B and C all of equal lengths.
+
+
+<div class="fig figcenter fighighlight" markdown="true">
+  <img src="/Win2018/assets/lecture12/Eq_length.png" width="70%">
+  <div class="figcaption">An example configurations of two transcripts \(t_1\)
+  and \(t_2\). There are three exons \(A, B,\) and \(C\) all of
+  the same length implying that the transcripts  \(t_1\)
+  and \(t_2\) have the same length.
+  </div>
+</div>
+
+The initial read assignment will be
+
+- read from Exon A $$ \longrightarrow\ $$ +1 to $$t_1$$, +0 to $$t_2$$
+
+- read from Exon B $$ \longrightarrow\ $$ +0.5 to $$t_1$$, +0.5 to $$t_2$$
+
+- read from Exon C $$ \longrightarrow\ $$ +0 to $$t_1$$, +1 to $$t_2$$
+
+
+To make the example more concrete, and assume we collect 40 reads:
+ 20 reads from exon A and 20 from exon B.
+ With this model, we would assign $$20 + 10(0.5) = 30\ $$ reads to
+ $$t_1$$ and $$0 + 20(0.5) = 10\ $$ to $$t_2$$, which results in
+ $$\hat{\rho_1} = \frac{30}{40} = 0.75$$ and
+$$\hat{\rho_2} = \frac{10}{40} = 0.25$$.
+However our estimates are way off as because 0.25 is much more than 0.
+
+However, the algorithm gives us a way to improve
+our estimates: now, we use our new $$\hat{\rho}$$
+values to determine what weights we should use when
+assigning the values from the multi-mapped reads.
+Thus, in this case, we can change the weight assignment to
+
+read from Exon B $$ \longrightarrow\ $$ +0.75 to $$t_1$$, +0.25 to $$t_2$$
+
+Where the weights are equal to the $$\hat{\rho}$$ values in
+this case because the reads are of equal length. Now, we can recompute our
+estimates of $$\hat{\rho_1}$$ and $$\hat{\rho_2}$$ according
+to this new distribution of credit.
+
+Thus in the second iteration of the algorithm,
+we have that the count for
+$$t_1 = 20 + 20(0.75) = 35\ $$ so $$\hat{\rho_1} = 0.875\ $$.
+
+Similarly,
+the count for $$t_2 = 0 + 20(0.25) = 5\ $$ so $$\hat{\rho_2} = 0.125\ $$
+
+In this case, each iteration is taking us
+ half the remaining distance to the ground truth (1 and 0),
+  and, if you repeat this process, it will
+  converge (to the ground truth, no less).
+
+#### <a id='algo2'></a>General Algorithm for Sequences of Different Lengths
+
+Now we assume that we have $$K$$ transcripts $$t_1, t_2, \cdots, t_k\ $$
+of known lengths $$\ell_1, \ell_2, \cdots, \ell_k\ $$. Let $$\rho_1, \cdots
+, \rho_k\ $$ be the abundances of each of the transcripts.
+
+We define $$\alpha_i\ $$ as the normalised abundance of transcript $$t_i\ $$
+which is the expected fraction of reads one would expect from transcript
+$$t_i$$. More concretely
+\\[\alpha_k = \frac{\rho_k \ell_k} {\sum_{j=1}^K\rho_j \ell_j},\ \ k=1,2,...,K\\]
+
+\\[\rho_k = \frac{\frac{\alpha_k}{\ell_k}}
+{\sum_{j=1}^K \frac{\alpha_j}{\ell_j}},\ \ k=1,2,...,K\\]
+
+We now define the EM algorithm as before estimating $$\alpha_i$$
+and inferring $$\rho_i$$ from them.
+
+1. Since we know nothing about the abundances to begin with, our initial
+estimate is uniform.  That is  
+\\[\hat{\rho}_k^{(1)}=\frac{1}{K},k=1,2,...,K\\]
+
+
+2. For step $$m=1,2,...$$ repeat:  
+- For $$i=1,2,..,N$$   let read $$R_i$$ map to to a set $$S_i$$ of transcripts,
+denoted by $$R_i \to S_i$$.
+Then, split $$R_i$$ into fractional
+counts for each transcript $$k \in S_i$$, equal to the
+relative abundances of the transcripts in $$S_i$$,
+as follows:  
+$$
+f_{ik}^{(m)}=\begin{cases}
+\frac{\rho_k^{(m)}}{\sum_{j \in S_i}{\rho_j^{(m)}}} &\text{if }k \in S_i \\
+0 & \text{otherwise}  \end{cases}
+$$  
+- The updated estimate of $$\alpha_i$$ is, obviously,  
+$$
+\hat{\alpha}_k^{(m+1)}=\frac{1}{N}\sum_{i=1}^{N}{f_{ik}^{(m)}}
+$$
+- The updated estimate of $$\rho_i$$ is then
+$$
+\hat{\rho}_k^{(m+1)}=\frac{\frac{\alpha_k^{(m+1)}}{\ell_k}}
+{\sum_{j=1}^K \frac{\alpha_j^{(m+1)}}{\ell_j}}
+$$
+
+##### <a id='eg2'></a>A Concrete Example
+
+Let there exist two transcripts $$t_1$$ and
+$$t_2$$ of abundances $$\rho_1 =0.75 \ $$ and $$ \rho_2 =0.25 \ $$
+as shown below, where there are two exons
+A and B  of equal lengths. Due to this $$\ell_1 = 2 \ell_2$$
+in the example.
+
+<div class="fig figcenter fighighlight" markdown="true">
+  <img src="/Win2018/assets/lecture12/Uneq_length.png" width="70%">
+  <div class="figcaption">An example configurations of two transcripts \(t_1\)
+  and \(t_2\). There are two exons \(A\) and \(B\) both  of
+  the same length implying that the the length of transcript  \(t_1\),
+  \(\ell_1\) is twice the length of transcript
+   \(t_2\), \(\ell_2\). In other words \(\ell_1 = 2 \ell_2\).
+  </div>
+</div>
+
+Before we go further, note the sampling model is not as
+straight forward as in the first example. Because the transcripts
+are different lengths we must consider their lengths when considering
+the probability that a read comes from that transcript. You can imagine
+the read sampling model as appending together all of the transcripts according
+to their abundance, then randomly taking a read from that single, long sequence.
+So, in this case, for $$\rho_1=0.75$$ and $$\rho_2 = 0.25$$, you can imagine
+appending three copies of $$t_1$$ and one copy of $$t_2$$
+together, and then taking a read from that.
+
+Now, if we collect 70 reads, we can expect 30 to come from
+exon A in $t_1$, 30 to come from exon B in $$t_1$$, and 10 to come
+from $$t_2$$. For simplicity assume we see exactly that.
+
+Before, when the transcripts were equal length, which simplified the problem.
+Now that the transcripts are different lengths, it will involve an extra,
+intermediate step. To account for this, we will be introducing a new set
+of intermediate variables: $$\alpha_1$$ and $$\alpha_2$$ are the fraction
+of reads assigned to transcript 1 and transcript 2 according to the $$\rho$$
+values for the given iteration. We then use the $$\alpha$$ variables to get
+the new $$\rho$$ values according to the equation:
+
+\\[\rho_i = \cfrac{\cfrac{\alpha_i}{\ell_i}}{\cfrac{\alpha_1}{\ell_1} +
+ \cfrac{\alpha_2}{\ell_2}}\\]
+
+where $$\ell_1$$ and $$\ell_2$$ are the lengths of the transcripts.
+In our example, we'll take $\ell_1 = 2$ and $\ell_2 = 1$ for simplicity.
+
+###### First iteration
+
+So, we start with $$\hat{\rho_{1}}^{(0)} = \hat{\rho_2}^{(0)} = 0.5\ \ $$,
+which results in the calculations:
+
+\\[\alpha_1 = \frac{30 + 40(0.5)}{70} = \frac{5}{7} = 0.714\\]
+
+\\[\alpha_2 = \frac{0 + 40(0.5)}{70} = \frac{2}{7} = 0.286\\]
+
+Now, we use $$\alpha_1$$ and $$\alpha_2$ to calculate the $$\rho$$ variables.
+
+\\[\hat{\rho_{1}}^{(1)} =
+ \cfrac{\frac{0.714}{2}}{\frac{0.714}{2} + 0.286} = 0.555\\]
+
+\\[\hat{\rho_{2}}^{(1)} = \cfrac{0.286}{\frac{0.714}{2} + 0.286} = 0.444\\]
+
+With these new $$\hat{\rho}$$ values, we can move on to the second
+iteration and repeat the process.
+
+###### Second iteration
+Start by calculating the $$\alpha$$ values using
+the $$\hat{\rho}$$ values to distribute the credit from the multi-mapped reads:
+
+\\[\alpha_1 = \frac{30 + 40(0.555)}{70} = 0.746\\]
+
+\\[\alpha_2 = \frac{0 + 40(0.444)}{70} = 0.254\\]
+
+Use these to calculate $$\hat{\rho_{1}}^{(2)}$$ and $$\hat{\rho_{2}}^{(2)}$$:
+
+\\[\hat{\rho_{1}}^{(2)} =
+\cfrac{\frac{0.746}{2}}{\frac{0.746}{2} + 0.254} = 0.595\\]
+
+\\[\hat{\rho_{2}}^{(2)} = \cfrac{0.254}{\frac{0.746}{2} + 0.254} = 0.405\\]
+
+And so on and so forth. The following script carries out 50 iterations of this
+particular example and then plots the $$\hat{\rho}$$
+estimates over time. As you can see, they converge to
+0.75 and 0.25, the ground truth values.
 
 {% highlight python %}
 
@@ -167,11 +358,18 @@ print("The value of (rho1, rho2) are (%.3f, %.3f)"%
 
     The value of (rho1, rho2) are (0.750, 0.250)
 
-#### <a id='goodness'></a> How to decide if an algorithm is good
-Now that we have an algorithm, what characteristics of it can we examine as we decide whether or not it is "good"?
+#### <a id='goodness'></a> How to decide if an algorithm is good?
+Now that we have an algorithm, what characteristics of it can we
+examine as we decide whether or not it is "good"?
 
 ##### 1. Does it converge?
-Obviously, we want an algorithm that converges so that we can have our estimates. In this case, the algorithm is guaranteed to converge, although it is not guaranteed to converge in general. In general, it converges if your generative model belongs to the [exponential family](https://en.wikipedia.org/wiki/Exponential_family).
+Obviously, we want an algorithm that converges so that we can have our
+estimates. In this case, the algorithm is guaranteed to converge,
+although it is not guaranteed to converge in general. In general,
+it converges if your generative model belongs to the
+[exponential family](https://en.wikipedia.org/wiki/Exponential_family).
+More details can be found
+[here](http://statweb.stanford.edu/~jtaylo/courses/stats306b/restricted/notebooks/EM_algorithm.pdf).
 
 
 ##### 2. Is it accurate?
