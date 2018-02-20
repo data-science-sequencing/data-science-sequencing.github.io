@@ -21,6 +21,16 @@ Tuesday 20 February 2018
     - <a href='#application'>Application to our problem</a>
     - <a href='#hard'>"Hard" EM</a>
 
+
+### <a id='em'></a> Algorithm for equal length transcripts
+
+As a recap, recall the algorithm we discussed last lecture:
+
+1. Initial abundances estimates $$\rho_1^{(0)}, \dots, \rho_K^{(0)}$$
+2. At each iteration $$m = 0, 1, 2, \dots $$, for read $$r_i$$ and for each transcript $$k \in S_i$$,
+$$f_{ik}^
+
+
 ### <a id='ml'></a>Maximum Likelihood estimation
 
 Let $$\mathbf{\rho}=[\rho_1\ \rho_2\ ...\ \rho_K]^T \ $$ be the vector of transcript abundances.
@@ -236,7 +246,3 @@ Given its possible benefits over the _soft_ version, the questions that arise ar
 1. Will it work for the example of section <a href='#shortcomings'>shortcomings of naive splitting</a>
  where there is a common exon in two different transcripts?  
 2. Will it work in general?
-
-----
-<!--
-- The figure here is due to Paraskevas Deligiannis. -->

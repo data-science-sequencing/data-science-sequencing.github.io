@@ -11,7 +11,7 @@ _scribed by Logan Spear and edited by the course staff_
 
 -----------------
 
-## Topics
+### Topics
 
 In the previous lecture, we introduced [RNA-seq](https://en.wikipedia.org/wiki/RNA-Seq)
  and the quantification problem. In this lecture, we dive deeper into this problem
@@ -25,11 +25,11 @@ examine how we can solve it optimally under some simplicity assumptions.
         - <a href='#eg1'>A concrete example</a>
     - <a href='#algo2'>General Algorithm for the case of different length transcripts</a>
         - <a href='#eg2'>A concrete example</a>
-1. <a href='#goodness'>How to decide if an algorithm is good?</a>
+1. <a href='#goodness'>Evaluating the EM algorithm</a>
 
 ### <a id='intro'></a>RNA-Seq quantification
 
-As discussed in the last lecture, the RNA-seq data consist of multiple reads sampled from the various RNA transcripts in a given tissue (after the reverse transcription of RNA to cDNA).
+As discussed in the last lecture, the RNA-seq data consists of multiple reads sampled from the various RNA transcripts in a given tissue (after the reverse transcription of RNA to cDNA).
 We assume that these reads are short in comparison to the RNA transcripts.
 
 We also assume that we know the list of all possible RNA transcripts $$t_1,t_2, \dots,t_K$$
@@ -58,15 +58,15 @@ We consider two types of reads:
 
 The difficulty of the above counting problem lies in the existence of the latter type of read. The simplest strategy for handling these types of reads is to just throw them away and work with only uniquely mapped reads. We see immediately that this approach fails if all the reads for a transcript comes from only exon B.
 
-A less naive approach to deal with these reads would be to split them, i.e. assign a fractional count to each transcript a read maps to. We can split a multimapped read equally among all transcripts it is mapped to. For instance, if a read maps to exon B, then each transcript gets a count of $$\frac{1}{2}$$. Finally, our estimate of the abundance of $$t_k$$ with total count $$N_k$$ is
+A less naive approach to deal with these reads would be to split them, i.e. assign a fractional count to each transcript a read maps to. We can split a multimapped read equally among all transcripts it is mapped to. For our example above, if a read maps to exon B, then each transcript gets a count of $$\frac{1}{2}$$. Finally, our estimate of the abundance of $$t_k$$ with total count $$N_k$$ is
 
 $$
 \hat{\rho}_k=\frac{N_k}{N}
 $$
 
-While naive read splitting sounds reasonable, it can fail spectacularly as well. Assume our ground truth is that $$\rho_1=1$$ and $$\rho_2=0$$. As a result, some of our $$N=20$$ reads come from exon A and some come from exon B. Let's assume that half of the reads come form each exon (even though the figure above does not depict the two exons as of equal length).
+While naive read splitting sounds reasonable, it can fail spectacularly as well. Assume our ground truth is that $$\rho_1=1$$ and $$\rho_2=0$$. As a result, some of our $$N=20$$ reads come from exon A and some come from exon B. Let's assume that half of the reads come from each exon (even though the figure above does not depict the two exons as of equal length).
 
-All the reads coming from exon A map uniquely to $$t_1$$ and thus, they contribute a total of $$\frac{20}{2}=10$$ to the count $$N_1$$ of $$t_1$$. All the $$\frac{20}{2}=10$$ reads coming from exon B map to both transcripts and according to the naive algorithm above, each of them contributes $$\frac{1}{2}$$ to each of the counts $$N_1, N_2.$$ As a result, our estimate is that
+All the reads coming from exon A map uniquely to $$t_1$$ and thus they contribute a total of $$\frac{20}{2}=10$$ to the count $$N_1$$ of $$t_1$$. All $$\frac{20}{2}=10$$ reads coming from exon B map to both transcripts and according to the naive algorithm above, each of them contributes $$\frac{1}{2}$$ to each of the counts $$N_1, N_2.$$ As a result, our estimate is that
 
 $$
 \hat{\rho}_1=\frac{10+10*0.5}{20}=0.75,
@@ -117,11 +117,11 @@ $$
 \hat{\rho}_k^{(m+1)}=\frac{1}{N}\sum_{i=1}^{N}{f_{ik}^{(m)}}
 $$
 
-##### <a id='eg1'></a>A Concrete Example
+**<a id='eg1'></a>A Concrete Example**
 
 Let there exist two transcripts $$t_1$$ and
 $$t_2$$ of abundances $$\rho_1 =1 \ $$ and $$ \rho_2 =0 \ $$
-as shown below, where there are three exons
+as shown below where there are three exons
 A, B and C all of equal lengths.
 
 
@@ -137,54 +137,38 @@ A, B and C all of equal lengths.
 The initial read assignment will be
 
 - read from Exon A $$ \longrightarrow\ $$ +1 to $$t_1$$, +0 to $$t_2$$
-
 - read from Exon B $$ \longrightarrow\ $$ +0.5 to $$t_1$$, +0.5 to $$t_2$$
-
 - read from Exon C $$ \longrightarrow\ $$ +0 to $$t_1$$, +1 to $$t_2$$
 
-
-To make the example more concrete, and assume we collect 40 reads:
+Assume we collect 40 reads:
  20 reads from exon A and 20 from exon B.
  With this model, we would assign $$20 + 10(0.5) = 30\ $$ reads to
  $$t_1$$ and $$0 + 20(0.5) = 10\ $$ to $$t_2$$, which results in
  $$\hat{\rho_1} = \frac{30}{40} = 0.75$$ and
 $$\hat{\rho_2} = \frac{10}{40} = 0.25$$.
-However our estimates are way off as because 0.25 is much more than 0.
+Our estimates, however, are way off as 0.25 is much more than 0.
 
-However, the algorithm gives us a way to improve
-our estimates: now, we use our new $$\hat{\rho}$$
+The algorithm gives us a way to improve our estimates. We can use our new $$\hat{\rho}$$
 values to determine what weights we should use when
 assigning the values from the multi-mapped reads.
-Thus, in this case, we can change the weight assignment to
+Thus, in this case, we can change the weight assignment for reads from exon B to
 
-read from Exon B $$ \longrightarrow\ $$ +0.75 to $$t_1$$, +0.25 to $$t_2$$
+- read from Exon B $$ \longrightarrow\ $$ +0.75 to $$t_1$$, +0.25 to $$t_2$$
 
-Where the weights are equal to the $$\hat{\rho}$$ values in
+The weights are equal to the $$\hat{\rho}$$ values in
 this case because the reads are of equal length. Now, we can recompute our
 estimates of $$\hat{\rho_1}$$ and $$\hat{\rho_2}$$ according
-to this new distribution of credit.
+to this new distribution of credit. Thus in the second iteration of the algorithm,
+we have that the count for $$t_1 = 20 + 20(0.75) = 35\ $$ so $$\hat{\rho_1} = 0.875\ $$. Similarly, the count for $$t_2 = 0 + 20(0.25) = 5\ $$ so $$\hat{\rho_2} = 0.125\ $$.
 
-Thus in the second iteration of the algorithm,
-we have that the count for
-$$t_1 = 20 + 20(0.75) = 35\ $$ so $$\hat{\rho_1} = 0.875\ $$.
-
-Similarly,
-the count for $$t_2 = 0 + 20(0.25) = 5\ $$ so $$\hat{\rho_2} = 0.125\ $$
-
-In this case, each iteration is taking us
- half the remaining distance to the ground truth (1 and 0),
-  and, if you repeat this process, it will
-  converge (to the ground truth, no less).
+In this case, each iteration is taking us half the remaining distance to the ground truth (1 and 0). If you repeat this process, it will converge to the ground truth.
 
 #### <a id='algo2'></a>General Algorithm for Sequences of Different Lengths
 
 Now we assume that we have $$K$$ transcripts $$t_1, t_2, \cdots, t_k\ $$
-of known lengths $$\ell_1, \ell_2, \cdots, \ell_k\ $$. Let $$\rho_1, \cdots
-, \rho_k\ $$ be the abundances of each of the transcripts.
+of known lengths $$\ell_1, \ell_2, \dots, \ell_k\ $$. Let $$\rho_1, \dots
+, \rho_k\ $$ be the abundances of each of the transcripts. We define $$\alpha_i\ $$ as the normalized abundance of transcript $$t_i\ $$, which is the expected fraction of reads one would expect from transcript $$t_i$$. More concretely
 
-We define $$\alpha_i\ $$ as the normalised abundance of transcript $$t_i\ $$
-which is the expected fraction of reads one would expect from transcript
-$$t_i$$. More concretely
 \\[\alpha_k = \frac{\rho_k \ell_k} {\sum_{j=1}^K\rho_j \ell_j},\ \ k=1,2,...,K\\]
 
 \\[\rho_k = \frac{\frac{\alpha_k}{\ell_k}}
@@ -220,40 +204,37 @@ $$
 {\sum_{j=1}^K \frac{\alpha_j^{(m+1)}}{\ell_j}}
 $$
 
-##### <a id='eg2'></a>A Concrete Example
+**<a id='eg2'></a>A Concrete Example**
 
-Let there exist two transcripts $$t_1$$ and
-$$t_2$$ of abundances $$\rho_1 =0.75 \ $$ and $$ \rho_2 =0.25 \ $$
-as shown below, where there are two exons
-A and B  of equal lengths. Due to this $$\ell_1 = 2 \ell_2$$
+Assume we have two transcripts $$t_1$$ and $$t_2$$ of abundances $$\rho_1 =0.75 \ $$ and $$ \rho_2 =0.25 \ $$ as shown below where there are two exons
+A and B  of equal lengths. Note that $$\ell_1 = 2 \ell_2$$
 in the example.
 
 <div class="fig figcenter fighighlight" markdown="true">
   <img src="/Win2018/assets/lecture12/Uneq_length.png" width="70%">
   <div class="figcaption">An example configurations of two transcripts \(t_1\)
   and \(t_2\). There are two exons \(A\) and \(B\) both  of
-  the same length implying that the the length of transcript  \(t_1\),
-  \(\ell_1\) is twice the length of transcript
+  the same length implying that the the length of transcript \(t_1\),
+  \(\ell_1\), is twice the length of transcript
    \(t_2\), \(\ell_2\). In other words \(\ell_1 = 2 \ell_2\).
   </div>
 </div>
 
 Before we go further, note the sampling model is not as
-straight forward as in the first example. Because the transcripts
+straightforward as in the first example. Because the transcripts
 are different lengths we must consider their lengths when considering
 the probability that a read comes from that transcript. You can imagine
 the read sampling model as appending together all of the transcripts according
-to their abundance, then randomly taking a read from that single, long sequence.
-So, in this case, for $$\rho_1=0.75$$ and $$\rho_2 = 0.25$$, you can imagine
-appending three copies of $$t_1$$ and one copy of $$t_2$$
-together, and then taking a read from that.
+to their abundance and then randomly taking a read from that single, long sequence.
+In this case, for $$\rho_1=0.75$$ and $$\rho_2 = 0.25$$, you can imagine
+first appending three copies of $$t_1$$ and one copy of $$t_2$$
+together, and then sampling a read from this long sequence.
 
-Now, if we collect 70 reads, we can expect 30 to come from
-exon A in $t_1$, 30 to come from exon B in $$t_1$$, and 10 to come
+If we collect 70 reads, we can expect 30 to come from
+exon A in $$t_1$$, 30 to come from exon B in $$t_1$$, and 10 to come
 from $$t_2$$. For simplicity assume we see exactly that.
 
-Before, when the transcripts were equal length, which simplified the problem.
-Now that the transcripts are different lengths, it will involve an extra,
+Now that the transcripts are different lengths, the EM algorithm will involve an extra,
 intermediate step. To account for this, we will be introducing a new set
 of intermediate variables: $$\alpha_1$$ and $$\alpha_2$$ are the fraction
 of reads assigned to transcript 1 and transcript 2 according to the $$\rho$$
@@ -264,18 +245,18 @@ the new $$\rho$$ values according to the equation:
  \cfrac{\alpha_2}{\ell_2}}\\]
 
 where $$\ell_1$$ and $$\ell_2$$ are the lengths of the transcripts.
-In our example, we'll take $\ell_1 = 2$ and $\ell_2 = 1$ for simplicity.
+For simplicity, we'll take $$\ell_1 = 2$$ and $$\ell_2 = 1$$.
 
-###### First iteration
+_First iteration_
 
-So, we start with $$\hat{\rho_{1}}^{(0)} = \hat{\rho_2}^{(0)} = 0.5\ \ $$,
+We start with $$\hat{\rho_{1}}^{(0)} = \hat{\rho_2}^{(0)} = 0.5\ \ $$,
 which results in the calculations:
 
 \\[\alpha_1 = \frac{30 + 40(0.5)}{70} = \frac{5}{7} = 0.714\\]
 
 \\[\alpha_2 = \frac{0 + 40(0.5)}{70} = \frac{2}{7} = 0.286\\]
 
-Now, we use $$\alpha_1$$ and $$\alpha_2$ to calculate the $$\rho$$ variables.
+Now, we use $$\alpha_1$$ and $$\alpha_2$$ to calculate the $$\rho$$ variables.
 
 \\[\hat{\rho_{1}}^{(1)} =
  \cfrac{\frac{0.714}{2}}{\frac{0.714}{2} + 0.286} = 0.555\\]
@@ -285,7 +266,8 @@ Now, we use $$\alpha_1$$ and $$\alpha_2$ to calculate the $$\rho$$ variables.
 With these new $$\hat{\rho}$$ values, we can move on to the second
 iteration and repeat the process.
 
-###### Second iteration
+_Second iteration_
+
 Start by calculating the $$\alpha$$ values using
 the $$\hat{\rho}$$ values to distribute the credit from the multi-mapped reads:
 
@@ -306,7 +288,6 @@ estimates over time. As you can see, they converge to
 0.75 and 0.25, the ground truth values.
 
 {% highlight python %}
-
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -351,48 +332,32 @@ print("The value of (rho1, rho2) are (%.3f, %.3f)"%
 
 {% endhighlight %}
 
-
-
 ![png](/Win2018/assets/lecture12/Output.png)
 
+The value of (rho1, rho2) are (0.750, 0.250)
 
-    The value of (rho1, rho2) are (0.750, 0.250)
+### <a id='goodness'></a> Evaluating the EM algorithm
+We will ask two important questions for evaluating whether or not an algorithm is "good."
 
-#### <a id='goodness'></a> How to decide if an algorithm is good?
-Now that we have an algorithm, what characteristics of it can we
-examine as we decide whether or not it is "good"?
-
-##### 1. Does it converge?
-Obviously, we want an algorithm that converges so that we can have our
+#### Does it converge?
+Obviously, we want an algorithm that converges so that the algorithm actually generates
 estimates. In this case, the algorithm is guaranteed to converge,
 although it is not guaranteed to converge in general. In general,
-it converges if your generative model belongs to the
-[exponential family](https://en.wikipedia.org/wiki/Exponential_family).
-More details can be found
+EM converges if the generative model belongs to the
+[exponential family](https://en.wikipedia.org/wiki/Exponential_family). More details can be found
 [here](http://statweb.stanford.edu/~jtaylo/courses/stats306b/restricted/notebooks/EM_algorithm.pdf).
 
+#### Is it accurate?
+This question is a bit trickier, since we can only evaluate accuracy _relative_ to all other algorithms. We will examine the idea of Maximum Likelihood (ML), a gold standard when assessing algorithms.
 
-##### 2. Is it accurate?
-This question is a bit trickier, since it is not an absolute statement we can
-make about an algorithm, but rather a relative one. As in, we must compare this
-algorithm to all other algorithms when considering this. In order to answer
-this, we will first examine the idea of Maximum Liklihood (ML).
-
-Given some reads $$R_1, \dots, R_N\ $$, for a given model with parameters
-$$\rho_1, \dots, \rho_k \ $$,
-we write the probability of observing the reads
+Given some reads $$R_1, \dots, R_N\ $$ for a given model with parameters
+$$\rho_1, \dots, \rho_k \ $$, we write the probability of observing the reads
 $$R_1, \dots, R_N\ $$ given the parameters $$\rho_1, \dots, \rho_k\ $$
-as  $$Pr(R_1, \dots, R_N$ ; $\rho_1, \dots, \rho_k)$$
+as  $$Pr(R_1, \dots, R_N ; \rho_1, \dots, \rho_k)$$. The idea of Maximum Likelihood is that our model should maximize this probability over the parameters. That is, our model should satisfy
 
-The idea of Maximum Liklihood is that our model should
-maximize this probability over the parameters.
-That is, our model should satisfy
+$$\max_{\rho_1, \dots, \rho_k} Pr(R_1, \dots, R_N ; \rho_1, \dots, \rho_k).$$
 
-$$\max_{\rho_1, \dots, \rho_k} Pr(R_1, \dots, R_N ; \rho_1, \dots, \rho_k)$$
-
-This is the idea of Maximum Liklihood, and is pretty much a gold standard when
-assessing algorithms. As it turns out, this algorithm gives the ML result.
-Thus we can say this is a good algorithm.
+As it turns out, the EM algorithm indeed gives the ML result, and thus we can say EM is a good algorithm.
 
 
 <!-- #### <a id='questions'></a>Questions
