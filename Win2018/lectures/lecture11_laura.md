@@ -1,6 +1,7 @@
 ---
 layout: page
 mathjax: true
+permalink: /Win2018/lectures/lecture11/
 ---
 ## Lecture 11: Haplotype Phasing & RNA-Seq
 

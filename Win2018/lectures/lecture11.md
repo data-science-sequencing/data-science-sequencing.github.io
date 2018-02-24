@@ -1,7 +1,7 @@
 ---
 layout: page
 mathjax: true
-permalink: /Win2018/lectures/lecture11/
+permalink: /Win2018/lectures/lecture111/
 ---
 ## Lecture 11: Haplotype Phasing
 
@@ -12,6 +12,7 @@ Tuesday 13 February 2018
 ## Topics
 
 1. 	<a href='#SMSDP'>Spectral algorithm</a>
+  - <a href='#genie'>Genie Aided Lower Bounds</a>
   - <a href='#SSA'>Spectral-Stitching Algorithm</a>
 1. 	<a href='#rna'>RNA-Seq</a>
   - <a href='#counting'>A counting problem</a>
@@ -26,7 +27,12 @@ Recall that we are looking at the phasing problem, reformulated as a community r
 	<div class="figcaption">Haplotype phasing as a community recovery problem.</div>
 </div>
 
-We ended the last lecture by introducing the _adjacency matrix_
+Computating all possible partitions and finding the links is exponential in the
+number of nodes. Thus, we would like to take advantage of global information,
+but we need a more efficient method of computation. The adjacency matrix $$A$$
+is an equivalent representation of the data where each column and row
+represents a SNP. This matrix is usually sparse (i.e. many entries are zero).
+The above example can be represented by the following  _adjacency matrix_:
 
 $$
 A =
@@ -38,7 +44,13 @@ A =
 \end{bmatrix}.
 $$
 
-Each row and column represents a SNP. $$A_{ij} = 1$$ indicates that the two SNPs are in the same community, and $$A_{ij} = -1$$ indicates the opposite. This adjacency matrix is typically sparse in practice. We need roughly $$n \log n$$ reads in order recover the communities ($$n$$ indicates the number of nodes). Where is the information we want in terms of this matrix?
+Each row and column represents a SNP. $$A_{ij} = 1$$ indicates that
+the two SNPs are in the same community, and $$A_{ij} = -1$$ indicates
+the opposite. $$A_{ij} = -1$$ indicates no measurement.
+This adjacency matrix is typically sparse in practice. We
+need roughly $$n \log n$$ reads in order recover the communities ($$n$$
+indicates the number of nodes). Where is the information we want in
+terms of this matrix?
 
 We introduced the concept of a _uniform linking model_ where
 
@@ -95,15 +107,30 @@ We want to study how the recovered matrix _concentrates_ around the true mean, a
 	<div class="figcaption">The recovered principal eigenvector concentrating on the true principal eigenvector as the number of edges increases (left: recovered eigenvector, right: thresholeded recovered eigenvector).</div>
 </div>
 
+#### <a id ='genie'><a/>Genie-aided lower bound
+
+We want to compute a lower bound on the number of reads required to produce a
+correct result. Suppose a genie told us the correct community of all
+SNPs except one (the blue node):
+
+<div class="fig figcenter fighighlight">
+  <img src="/Win2018/assets/lecture11/genie_phasing.png" width="80%">
+	<div class="figcaption">Genie tells us communities of all SNPs
+  expect one.</div>
+</div>
+
+It is still possible to make a mistake if the majority of the linking reads are
+wrong. A lower bound can be obtained  to show that
+:
+
+$$\text{# of linking reads} > \frac{n \log n}{2[1-e^{-D(0.5\|p)}]},$$
+
+where $$D(p||q)\ $$ represents the binary [Kullback-Liebler
+divergence](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence).
+
+
 #### <a id ='SSA'><a/>Spectral-Stitching Algorithm
 
-To improve this algorithm, we consider a lower bound on the performance of our algorithm (a function of the amount of linking nodes required). Consider the case where a genie tells you the correct community of all SNPs except one. (some more comments on this lower bound)
-
-We will omit the mathematical details and report the final result:
-
-$$
-\text{# of linking reads} > \frac{n \log n}{2[1-e^{-D(0.5\|p)}]}.
-$$
 
 We introduce a two-step algorithm:
 
@@ -139,7 +166,12 @@ One method for measuring phasing performance is _N50_. The output of a phasing a
 	<div class="figcaption">Visual definition of the N50 phasing metric.</div>
 </div>
 
-Another method for measuring phasing performance are _switch errors_ within a phased block. We occasionally make some errors within a block, either a short switch error (e.g. 1 SNP) and a long switch error (a long continuous segment of incorrect calls). Intuitively, a long switch error of length, say, 10, should not be worth 10 short switch errors, which is why reporting both these types of errors are useful.
+Another method for measuring phasing performance are _switch errors_ within
+a phased block. We occasionally make some errors within a block, either a short
+switch error (e.g. 1 SNP) and a long switch error (a long continuous segment
+of incorrect calls). Intuitively, a long switch error of length, say, 10, 
+should not be worth 10 short switch errors, which is why reporting both
+these types of errors are useful.
 
 <div class="fig figcenter fighighlight">
   <img src="/Win2018/assets/lecture11/switching.png" width="70%">
