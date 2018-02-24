@@ -3,7 +3,7 @@ layout: page
 mathjax: true
 permalink: /Win2018/lectures/lecture11/
 ---
-## Lecture 11: Haplotype Phasing
+## Lecture 11: Haplotype Phasing - Spectral Stitching
 
 Tuesday 13 February 2018
 
