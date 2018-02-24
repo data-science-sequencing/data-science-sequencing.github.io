@@ -1,7 +1,7 @@
 ---
 layout: page
 mathjax: true
-permalink: /Win2018/lectures/lecture111/
+permalink: /Win2018/lectures/lecture11/
 ---
 ## Lecture 11: Haplotype Phasing
 
@@ -169,7 +169,7 @@ One method for measuring phasing performance is _N50_. The output of a phasing a
 Another method for measuring phasing performance are _switch errors_ within
 a phased block. We occasionally make some errors within a block, either a short
 switch error (e.g. 1 SNP) and a long switch error (a long continuous segment
-of incorrect calls). Intuitively, a long switch error of length, say, 10, 
+of incorrect calls). Intuitively, a long switch error of length, say, 10,
 should not be worth 10 short switch errors, which is why reporting both
 these types of errors are useful.
 
