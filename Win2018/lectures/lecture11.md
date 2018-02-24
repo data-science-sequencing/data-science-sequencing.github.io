@@ -7,6 +7,8 @@ permalink: /Win2018/lectures/lecture11/
 
 Tuesday 13 February 2018
 
+_scribed by Laura Shen and edited by the course staff_
+
 -----------------
 
 ## Topics
