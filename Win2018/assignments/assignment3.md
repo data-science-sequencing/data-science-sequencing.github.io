@@ -84,9 +84,9 @@ In this problem, we will analyze the single-cell RNA-Seq dataset published by Ze
 - Run tSNE and plot the first two tSNE components (Note: this may take a few minutes)
 - Run tSNE on the top 50 principal components and plot the first two tSNE components
 
-4. Using sklearn, we will test 4 different [clustering algorithms](http://scikit-learn.org/stable/modules/clustering.html) on the dataset and evaluate their performance using the true labels provided by the authors. The four clustering methods are K-means clustering, spectral clustering, affinity propagation, and density-based spatial clustering of applications with noise (DBSCAN). Using the top 50 principal components for the log-transformed data, for each clustering method:
+4. Using sklearn, we will test 4 different [clustering algorithms](http://scikit-learn.org/stable/modules/clustering.html) on the dataset and evaluate their performance using the labels provided by the authors. The four clustering methods are K-means clustering, spectral clustering, affinity propagation, and density-based spatial clustering of applications with noise (DBSCAN). Using the top 50 principal components for the log-transformed data, for each clustering method:
 - Describe the hyperparameters one needs to tune
-- Tune the hyperparameters until you obtain reasonable labels (i.e. you obtain about 9 clusters)
+- Tune the hyperparameters until you obtain reasonable labels (i.e. you obtain about 9 clusters, just like the authors did)
 - Report your final hyperparameters
 - Compare your labels to the true labels using sklearn's [adjusted Rand Index](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.adjusted_rand_score.html).
 
