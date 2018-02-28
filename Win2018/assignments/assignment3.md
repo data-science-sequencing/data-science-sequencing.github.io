@@ -5,8 +5,8 @@ permalink: /Win2018/assignments/assignment3/
 ---
 ## Assignment 3
 
-posted Tuesday 27 February 2018  
-due Tuesday 12 March 2018 at 11:59pm
+posted Wednesday 28 February 2018  
+due Wednesday 13 March 2018 at 11:59pm
 
 **Submission policy**: Report all plots and your code in [this Jupyter notebook](/Win2018/assets/assignment3/ee372_assignment3.ipynb). Print your notebook as a PDF and attach it to the rest of your assignment. Turn in your assignment through [Gradescope](https://gradescope.com/).
 
@@ -28,7 +28,7 @@ Explain how this metric captures similarity between two sets and how you might u
 
 5. In practice, we would use multiple $$H$$ hash functions to compute multiple minhash indices for $$R_1$$ and $$R_2$$. Write down an estimator that uses the $$H$$ minhash indices to estimate $$J(R_1,R_2)$$. What is the runtime complexity of obtaining this estimation? How does this compare to the runtime you obtained for part 3?
 
-### Question II: Haplotype phasing 
+### Question II: Haplotype phasing
 
 In this problem we examine a simplified version of the haplotype
 assembly problem. We assume that a genome has $$n$$ SNPs, and each
