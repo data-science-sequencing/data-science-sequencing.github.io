@@ -28,7 +28,7 @@ Explain how this metric captures similarity between two sets and how you might u
 
 5. In practice, we would use multiple $$H$$ hash functions to compute multiple minhash indices for $$R_1$$ and $$R_2$$. Write down an estimator that uses the $$H$$ minhash indices to estimate $$J(R_1,R_2)$$. What is the runtime complexity of obtaining this estimation? How does this compare to the runtime you obtained for part 3?
 
-### Question II: Haplotype phasing coverage
+### Question II: Haplotype phasing 
 
 In this problem we examine a simplified version of the haplotype
 assembly problem. We assume that a genome has $$n$$ SNPs, and each
