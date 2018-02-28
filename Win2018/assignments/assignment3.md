@@ -30,9 +30,30 @@ Explain how this metric captures similarity between two sets and how you might u
 
 ### Question II: Haplotype phasing coverage
 
-In this problem we examine a simplified version of the haplotype assembly problem. We assume that a genome has $$n$$ SNPs, and each SNP is heterozygous. Every mate-pair read covers a pair of adjacent SNPs.
+In this problem we examine a simplified version of the haplotype
+assembly problem. We assume that a genome has $$n$$ SNPs, and each
+SNP is heterozygous. Every mate-pair read covers a pair of
+adjacent SNPs.
+Download the Adjacency matrix of the SNPs from a 5000 base pair
+region
+(SNP 10000-1500) of chromosome 16 of NA12878
+[here](/Win2018/assets/assignment3/matrix_sparse.pkl).
+Use [pickle](https://wiki.python.org/moin/UsingPickle)
+to load the matrix. The matrix is a sparse format
+([scipy.sparce.csc_matrix](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csc_matrix.html)).
+One can
+convert a sparse matrix $$\texttt{A}$$ to dense by using
+$$\texttt{A.to_dense()}\ $$.  
 
-1. We assume that we know the exact position of the read on the genome by aligning the read to the genome. How many different types of reads do we obtain (restricting ourselves to their values at the SNP positions) if there were no errors?
+
+1. How many measurements are in the matrix?
+
+2. What is the maximum number of measurements between two SNPs? What would
+you expect the maximum number of measurments  to be if
+you had  an Erdos-Renyi
+graph with the same number of edges?
+
+3. 
 
 2. Given that we obtain $$N$$ mate-pair reads, argue that for large $$N$$ and $$n$$, the number of reads covering each adjacent pair of points $$\sim \text{Poisson}(N/n)$$.
 
