@@ -48,28 +48,21 @@ $$\texttt{A.to_dense()}\ $$.
 
 1. How many measurements are in the matrix?
 
-2. What is the maximum number of measurements between two SNPs? What would
+2. What is the maximum number of measurements between two SNPs?
+
+2. Is the graph connected?
+
+3. What would
 you expect the maximum number of measurments  to be if
 you had  an Erdos-Renyi
 graph with the same number of edges?
 
-3. 
+3. Download the ground truth of SNPs from
+[here](/Win2018/assets/assignment3/ground_truth.pkl). Get the primary
+eigenvector of the window of the first 200 SNPs in the
+adjacency matrix and find its correlation coefficient with the ground
+truth.
 
-2. Given that we obtain $$N$$ mate-pair reads, argue that for large $$N$$ and $$n$$, the number of reads covering each adjacent pair of points $$\sim \text{Poisson}(N/n)$$.
-
-3. If each position of each mate-pair read has an error rate of $$\delta \in [0,1]$$, argue that the number of erroneous pairwise measurements $$\sim \text{Poisson}(2\delta (1-\delta)N/n)$$.
-
-4. Given that there are $$m$$ reads covering a pair of consecutive positions, argue that the probability that a majority of the reads being wrong is approximately $$\exp(-mD(\frac{1}{2} \| 2\delta (1- \delta)))$$ where $$D(\frac{1}{2} \| 2 \delta (1-\delta))$$ represents the KL divergence between a $$\text{Bernoulli}(\frac{1}{2})$$ distribution and a $$\text{Bernoulli}(2 \delta(1 -\delta))$$ distribution. _Hint_: The probability of $$\text{Binomial}(m,q) > \frac{m}{2} \approx \exp(-m D (\frac{1}{2} \|q))$$.
-
-5. Using earlier parts or otherwise, compute an upper bound on the average probability of error in estimating the parity between SNR $$i$$ and $$i+1$$, in terms of $$N$$, $$n$$, and $$\delta$$.
-
-6. Our final goal is to phase the **entire** genome correctly. Using part 6 or otherwise, compute a bound on the probability of error in phasing the entire genome.
-
-7. For a given desired probability of phasing error $$\epsilon$$, use the bound in part 7 to give an expression for $$N^*$$, the number of mate-pair reads needed.
-
-8. For $$\epsilon = \delta = 0.01$$, plot $$N^*$$ as a function of $$n$$, the number of SNP's. How does $$N^*$$ scale with $$n$$ as $$n$$ grows? Linearly, sublinearly or superlinearly? Can you give an intuitive explnation for your answer?
-
-9. For $$\epsilon = 0.1, n=100,000$$, plot $$N^*$$ as a function of $$\delta$$, the read error rate.
 
 ### Question III: RNA-seq Quantification
 
