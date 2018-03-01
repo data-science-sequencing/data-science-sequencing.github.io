@@ -33,10 +33,8 @@ Explain how this metric captures similarity between two sets and how you might u
 In this problem we examine a simplified version of the haplotype
 assembly problem. We assume that a genome has $$n$$ SNPs, and each
 SNP is heterozygous. Every mate-pair read covers a pair of
-adjacent SNPs.
-Download the Adjacency matrix of the SNPs from a 5000 base pair
-region
-(SNP 10000-1500) of chromosome 16 of NA12878
+adjacent SNPs. Download the Adjacency matrix of the SNPs from a 5000 base pair
+region (SNP 10000-15000) of chromosome 16 of NA12878
 [here](/Win2018/assets/assignment3/matrix_sparse.pkl).
 Use [pickle](https://wiki.python.org/moin/UsingPickle)
 to load the matrix. The matrix is a sparse format
@@ -48,27 +46,23 @@ $$\texttt{A.to_dense()}\ $$.
 
 1. How many measurements are in the matrix?
 
-2. What is the maximum number of measurements between two SNPs?
-
 2. Is the graph connected?
 
-3. What would
-you expect the maximum number of measurments  to be if
-you had  an Erdos-Renyi
-graph with the same number of edges?
+3. What is the maximum number of measurements between two SNPs?
 
-3. Download the ground truth of SNPs from
+4. What would you expect the maximum number of measurements  to be if
+you had  an Erdos-Renyi graph with the same number of edges?
+
+5. Download the ground truth of SNPs from
 [here](/Win2018/assets/assignment3/ground_truth.pkl). Get the primary
-eigenvector of the window of the first 200 SNPs in the
-adjacency matrix and find its correlation coefficient with the ground
-truth.
+eigenvector of the window of the first 200 SNPs in the adjacency matrix and find its correlation coefficient with the ground truth. Repeat with the full 5000-by-5000 adjacency matrix. How does the correlation coefficient change? Why?
 
 
 ### Question III: RNA-seq Quantification
 
 In class we discussed the basic EM algorithm for RNA-seq quantification in the simple case when the transcript lengths are all the same and there are no errors in the read. In this question, we will consider extensions to unequal transcript lengths and read errors. We start with the same RNA-seq model as discussed in class.
 
-1. Implement the EM algorithm for the error-free case where all transcripts have the same length. Fill in the code in the last cell of the [Jupyter notebook](/Win2018/assets/assignment2/ee372_assignment3.ipynb).
+1. Implement the EM algorithm for the error-free case where all transcripts have the same length. Fill in the code in the [Jupyter notebook](/Win2018/assets/assignment2/ee372_assignment3.ipynb).
 
 2. Instead of equal transcript length $$\ell$$, let us now consider the case when the transcript lengths are $$\ell_1, \ell_2, \dots, \ell_K$$. The reads are still error-free.
 - Develop the log likelihood model
@@ -104,4 +98,4 @@ In this problem, we will analyze the single-cell RNA-Seq dataset published by Ze
 - Report your final hyperparameters
 - Compare your labels to the true labels using sklearn's [adjusted Rand Index](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.adjusted_rand_score.html).
 
-5. In a few sentences, describe how you might go about determining which genes most effectively distinguish a cluster from the other clusters (this is also known as _differential expression analysis_).
+5. Using scipy's [_t_-test](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_ind.html) function and the log-transformed data, identify the top 5 most significant genes for each of the authors' reported clusters.
