@@ -77,7 +77,7 @@ In class we discussed the basic EM algorithm for RNA-seq quantification in the s
 
 In this problem, we will analyze the single-cell RNA-Seq dataset published by Zeisel et al. in 2015. Download the dataset [here](/Win2018/assets/assignment3/Zeisel_data.zip).
 
-1. You can find the paper describing their experiment [here](http://science.sciencemag.org/content/347/6226/1138). Answer the following questions:
+1. You can find the paper describing their experiment [here](https://drive.google.com/drive/folders/1kT6g707L0pELvNNmz069ZROD5awidiu6?usp=sharing). Answer the following questions:
 - What kind of cells were they looking at? (and what organism did they come from?)
 - How many cells were there?
 - What is a unique molecular identifier and how was it used?
