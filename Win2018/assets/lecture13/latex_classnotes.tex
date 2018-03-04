@@ -1,0 +1,141 @@
+% hello.tex - Our first LaTeX example!
+\documentclass{article}
+\usepackage{amsmath}
+% \usepackage[document]{ragged2e}
+
+\begin{document}
+
+\section{RNA-seq Quantification and EM Algorithm}
+
+First we will assume that every transcript is of equal length, to simplify things. Our quantification algorithm will be performed in two steps: \newline
+
+1) Initial abundance estimate, pick starting $\rho$ (abundance) for each transcript:
+  \[\rho_1^0 ... \rho_K^0 \]
+
+2) Iteration (m=0,1,2,3...): \\ \\
+  For read $R_i$ and for each transcript $k  \epsilon  S_i$
+  (where k is every transcript that we can map in $S_i$ (the set of transcripts that contain read $r_i$)) \\ \\
+$f_{ik}$ is the fraction of read 1 that we allocate to k (if entire read, then equals 1)
+%
+\begin{equation}
+\  f_{ik}^m =
+  \begin{cases}
+    \rho_k^m \\
+    $$\sum\limits_{j \epsilon S_i}^{n}$$ \rho_i^m \\
+    0
+    % 1, & \text{otherwise}
+  \end{cases}
+  \end{equation}
+
+
+
+We will pick up from last lecture with a transcript quantification example: \\
+\\
+How can we extend this to a case where B appears as the only sequence in one of the transcripts?
+\\
+
+(insert diagram with A and B in transcript one ($\rho=.75$) and just B in transcript 2 ($\rho = .25$))
+\\
+
+In this case, the algorithm \textit(fails)
+
+In the equal length case, we say that the read could be split into two parts. \\ If this is true, we know that:
+$a_K \alpha \rho_k * l_k$ \\ where $a_k$ is the  normalized per-base abundance.
+
+
+% From last class: If we initialize with \[\rho_1=(1/2), \rho_2=(1/2)\]
+
+
+\section{Maximum Likelihood (ML)}
+
+Let $R_1 ...R_N$ be our collection of reads (data). We need to maximize the following probability such that our estimates of abundances correspond with the underlying ground truth abundance.
+\[
+  \max\limits_{\rho_1...\rho_K} P(R_1=r_1, R_2=r_2...R_N=r_n; \rho_1 ...\rho_K) \]
+\[
+  \text{where } \rho_k \text{ is the ML estimate } \rho_{ML}
+\]
+
+Likelihood Function: \\
+
+\[P(R_1=r_1... R_N=r_N;\rho)\]
+\[=P(R_1=r_1;\rho)*P(R_2=r_2;\rho) \text{ assuming independently sampled reads } R_1, R_2 \text{ etc...}\] \\
+\[P(R_1=r_1;\rho)\]
+\[\text{Given: string } R_1 \text{, need to compute the probabiliity that } R_1=r_1 \text{ is in the transcriptome}\]
+
+\vspace{1mm}
+Let's try a specific example:
+\[r_1=ATCC\]
+
+(insert diagram that shows that L is the read length, and l is the transcript length )
+\begin{equation}
+\  P(R_1 = ATCC;\rho)=
+  \begin{cases}
+    0 \text{ if ATCC appears in no transcripts}\\
+    \frac{1}{l-L+1} * \rho_5 \text{  if ATCC appears in transcript 5, for example} \\
+    \frac{1}{(l-L+1}
+    $$\sum\limits_{k \epsilon S_i}^{}$$ \rho_k \text{  (in general case)}\\
+    % 1, & \text{otherwise}
+  \end{cases}
+\end{equation}
+
+\[  P(R_1=r_1...R_N=r_n;\rho)\]
+\[  = \prod\limits_{i=1}^N \frac{1}{(l-L+1} \sum\limits_{k \epsilon S_i}^{} \rho_k \]
+\[  = \sum\limits_{i=1}^N log \frac{1}{(l-L+1} \sum\limits_{k \epsilon S_i}^{} \rho_k \]
+\[  = \sum\limits_{i=1}^N log \sum\limits_{k \epsilon S_i}^{} \rho_k + \text{constant}\]
+\[  = \sum\limits_{i=1}^N log \sum\limits_{k=1}^{k} y_ik \rho_k + \text{constant}\]
+\[  = \sum\limits_{i=1}^N log(Y_p)_i  \]
+Note that this last expression is a matrix multiplication, where Y is the reads data matrix, a sufficient statistic
+\begin{equation}
+\  y_{ik}=
+  \begin{cases}
+    1 \text{ if transcript k contains read r} \\
+    0 \text{ else}
+  \end{cases}
+\end{equation}
+
+\[S_i = \text{ set of transcripts that contain read } r_i \]
+
+How can we solve this maximum likelihood problem? The answer is either simply or with great difficulty, depending on the convexity of the function that we are trying to optimize. \\ In this case, we have a convex function (concave on a graph), which means that we can iteratively find solutions, and when they stop increasing we have reached the peak (optimized). This is not necessarily true in all cases, but has previously been shown to apply here. \\
+
+(insert graph of concave (convex) function here)
+
+This is the function that we derived earlier:
+\[= \sum\limits_{i=1}^N log(Y_p)_i \]
+
+Y is a linear function, log is a concave function, making the full function concave. We can solve this using the EM algorithm.
+
+\section{Expectation Maximization (EM)}
+The authors of the original EM paper were Dempster, Laird, Ruben (DLR), and the algorithm was written in 1977. It is iterative, and is guaranteed to converge on a global (!) ML solution. For likelihood $\theta$, we iterate:
+
+\[ \theta^0, \theta^1, ... \theta^m \]
+$\theta^m$ is guaranteed to increase and converge to global ML solution
+
+In this algorithm, we define a hidden variable Z that makes the likelihood calculation far simpler. We compute the following and iterate:
+
+  \begin{enumerate}
+    \item $P(Z=z|X=x;\theta) \text{    this is the posterior probability}$
+    \item $E[logP(x,z|\theta) \text{    this is the expectation}$
+    \item $\max\limits_\theta E_{post}[P(x,z|\theta)] \rightarrow \theta$
+  \end{enumerate}
+
+
+Once again, the hidden variable Z makes the ML calculation simple.
+
+A reminder of the log likelihood derived before:\\
+\[=\sum\limits_{i=1}^N log(Y_p)_i\]
+If each row of Y has exactly 1 nonzero entry, each term is just the log of one variable:
+$N_1logP_1 + N_2logP_2 ... + N_klog\rho_k$
+$\text{Solution = } \frac{N_k}{\rho_k} = \lambda \text{ if singly mapped reads!}$
+
+The hidden variable Z has more information than the reads themselves:
+\begin{equation}
+\  Z_ik=
+  \begin{cases}
+    1 \text{ if $r_i$ is sampled from transcript k} \\
+    0 \text{ else}
+  \end{cases}
+\end{equation}
+
+
+% \[    0 \text{   if ATCC appears in no }
+\end{document}
