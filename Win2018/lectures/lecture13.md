@@ -3,37 +3,50 @@ layout: page
 mathjax: true
 permalink: /Win2018/lectures/lecture13/
 ---
-## Lecture 13: RNA-seq - The EM Algorithm
+## Lecture 13: RNA-seq - Quantification and the EM Algorithm
 
 Tuesday 20 February 2018
+
+_scribed by Jacob Blum and edited by the course staff_
 
 -----------------
 
 ## Topics
 
+1.	<a href='#equal'>Algorithm for equal length transcripts</a>
 1.	<a href='#ml'>Maximum Likelihood estimation</a>
     - <a href='#convex'>Convexity</a>
     - <a href='#unique'>Special case: Uniquely-mapped reads</a>
 1.	<a href='#em'>Expectation-Maximization (EM) algorithm</a>
-    - <a href='#key'>Key idea</a>
     - <a href='#optimality'>Convergence & Optimality</a>
     - <a href='#steps'>Iterative steps</a>
     - <a href='#application'>Application to our problem</a>
-    - <a href='#hard'>"Hard" EM</a>
 
 
-### <a id='em'></a> Algorithm for equal length transcripts
+### <a id='equal'></a> Algorithm for equal length transcripts
 
-As a recap, recall the algorithm we discussed last lecture:
+For simplicity, we first we will assume that every transcript is of equal length. Let $$S_i$$ represent the set of transcripts that contain read $$r_i$$, and let $$f_{ik}$$ represent the fraction of read $$i$$ that we allocate to some $$k \in S_i$$. Our quantification algorithm will be performed in two steps:
 
-1. Initial abundances estimates $$\rho_1^{(0)}, \dots, \rho_K^{(0)}$$
-2. At each iteration $$m = 0, 1, 2, \dots $$, for read $$r_i$$ and for each transcript $$k \in S_i$$,
-$$f_{ik}^
+1. Initialize abundance estimates for each transcript:
+  $$\rho_1^0, \dots , \rho_K^0$$
 
+2. For step $$m=1,2,...$$ repeat:  
+- For $$i=1,2,..,N$$, split $$R_i$$ into fractional counts for each transcript $$k \in S_i$$, equal to the relative abundances of the transcripts in $$S_i$$. This splitting is done as follows:  
+$$
+f_{ik}^{(m)}=\begin{cases}
+\frac{\rho_k^{(m)}}{\sum_{j \in S_i}{\rho_j^{(m)}}} &\text{if }k \in S_i \\
+0 & \text{otherwise}  \end{cases}
+$$  
+- The updated estimate is  
+$$
+\hat{\rho}_k^{(m+1)}=\frac{1}{N}\sum_{i=1}^{N}{f_{ik}^{(m)}}
+$$
+
+Please refer to [lecture 12](/Win2018/lectures/lecture12/#eg2) for an example where transcript lengths are not equal and one transcript is a substring of the other.
 
 ### <a id='ml'></a>Maximum Likelihood estimation
 
-Let $$\mathbf{\rho}=[\rho_1\ \rho_2\ ...\ \rho_K]^T \ $$ be the vector of transcript abundances.
+Let $$r_1, \dots, r_N$$ be our collection of reads (data).
 The distribution of the reads depends on $$\mathbf{\rho}$$.
 Since the reads are sampled independently, we have that
 
@@ -50,19 +63,19 @@ Therefore, the probability
 $$
 \begin{equation}
 \begin{split}
-Pr(R_i=r_i;\mathbf{\rho}) = \sum_{k=1}^K&[{Pr(R_i\ maps\ to\ t_k;\mathbf{\rho}) \times Pr(r_i\ belongs\ to\ t_k) \times ...}  \\
-&...Pr(R_i\ starts\ at\ the\ position\ where\ r_i\ starts\ in\ t_k)].
+Pr(R_i=r_i;\mathbf{\rho}) = \sum_{k=1}^K&[{Pr(R_i\text{ maps to } t_k;\mathbf{\rho}) \times Pr(r_i\text{ belongs to } t_k) \times ...}  \\
+&...Pr(R_i\text{ starts at the position where } r_i\text{ starts in } t_k)].
 \end{split}
 \end{equation}
 $$
 
-The reads are sampled uniformly, so $$Pr(R_i\ maps\ to\ t_k;\mathbf{\rho})=\rho_k$$.
+The reads are sampled uniformly, so $$Pr(R_i\text{ maps to } t_k;\mathbf{\rho})=\rho_k$$.
 Also, each transcript $$t_k$$ has length $$l$$ and each read of length L coming from $$t_k$$
 has an equal chance of starting at each of the possible $$l-L+1$$
 positions, hence
 
 $$
-Pr(R_i\ starts\ at\ the\ position\ where\ r_i\ starts\ in\ t_k)=\frac{1}{l-L+1}.
+Pr(R_i\text{ starts at the position where } r_i\text{ starts in } t_k)=\frac{1}{l-L+1}.
 $$
 
 Finally, let
@@ -150,8 +163,6 @@ $$
 \argmax_{\mathbf{\theta}}{\ Pr(\mathbf{x};\mathbf{\theta})}.
 $$
 
-#### <a id='key'></a>Key idea
-
 The basic observation is that in many cases of statistical inference, the problem would become significantly easier, or even trivial, if we knew some unobserved _hidden_ variable(s) $$Z$$. For instance, in our case, if we somehow knew for every read which transcript it came from, then our problem would reduce to the simple problem with uniquely mapped reads. This information can be represented by a matrix $$Z$$ such that
 
 $$
@@ -226,23 +237,3 @@ $$
 
 
 where we have omitted the linear constraints on $$\mathbf{\rho}$$ for simplicity. One can verify that if we define $$\hat{N}_k = \sum_{i=1}^N{f_{ik}^{(m)}}$$, the above results follow readily from our analysis for the case of uniquely mapped reads. This is, after all, the reason why we use the _hidden_ variable $$Z$$.
-
-#### <a id='hard'></a>"Hard" EM
-
-The EM algorithm described above is a type of _soft_ EM in the sense that at each iteration,
-it calculates and uses only an estimate of the _distribution_ of
-$$Z$$ given $$\mathbf{x};\mathbf{\theta}$$.
-
-
-In contrast, a _hard_ EM algorithm would compute an estimate
-$$\hat{Z}$$ of the _values_ of $$Z$$ and then use it to
-assign each read $$R_i \to S_i$$ to the transcript $$t_k \in S_i$$
-that is most abundant according to the current estimate $$\mathbf{\hat{\rho}_k}$$.
-The [_hard_ algorithm](https://en.wikipedia.org/wiki/Expectation%E2%80%93maximization_algorithm#Description)
-commits a lot more to its estimates than the "soft" alternative but seems simpler to implement.
-
-Given its possible benefits over the _soft_ version, the questions that arise are:  
-
-1. Will it work for the example of section <a href='#shortcomings'>shortcomings of naive splitting</a>
- where there is a common exon in two different transcripts?  
-2. Will it work in general?
