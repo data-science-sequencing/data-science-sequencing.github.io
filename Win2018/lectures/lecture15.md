@@ -20,7 +20,7 @@ In previous lectures, we discussed bulk RNA-seq, which is done by **sample &rarr
 
 Tang et al. (2009) obtained a single-cell transcript abundance by isolating the cell before lysis. The abundance data from one cell, however, is not sufficient to represent the transcriptome distribution. Since multiple single-cell sequencing is necessary, the time-consuming and expensive procedure carried out by Tang et al. were replaced by platforms that parallelize the preparation process up to the sequencing step. Fluidigm C1, speeds up the isolation process by trapping and releasing single cells into individual microfluidic channels, whereas Drop-Seq used droplet and "tags" to allow for joint downstream processing.
 
-<div class="fig figcenter fighighlight"> <img src="/Win2018/assets/lecture15/abundance.png" width="60%"> <div class="figcaption"> Transcript Abudnace Distribution</div> </div>
+<div class="fig figcenter fighighlight"> <img src="/Win2018/assets/lecture15/abundance.png" width="40%"> <div class="figcaption"> Transcript Abudnace Distribution</div> </div>
 </br>
 ####<a id='fluidigm'></a>Fluidigm C1
 
@@ -58,7 +58,7 @@ $$E[# of collisions] = N(N-1)/2B = 77.3k $$
 
 Now we have obtained reads consisting of cell barcode, UMI and cDNA, we can estimante the transcript abundances. We first group reads by cell barcode, align cDNA reads, and then count unique molecules per cell per gene using UMI.
 
-<div class="fig figcenter fighighlight"> <img src="/Win2018/assets/lecture15/biasedreads2.png" width="50%"> <div class="figcaption">Recovering Cells by Barcode Grouping</div> </div>
+<div class="fig figcenter fighighlight"> <img src="/Win2018/assets/lecture15/biasedreads2.png" width="40%"> <div class="figcaption">Recovering Cells by Barcode Grouping</div> </div>
 </br>
 
 $$\text{The final output is a gene expression table, whose columns are cells, and rows are genes. There are 2 major sources of errors. An error can occur during sequencing and synthesis of barcodes, or each droplet can accidentally capture more than one cell. If the error occurs during sequencing, since the barcode is short, we can simply filter out the erroneous barcodes by choosing the ones with many read counts. For the case where a droplet captures more than one cell, we can model droplet arrivals with Poisson distribution. The parameter }\lambda\text{ is controlled by the concentration of the cells, all else being the same. There is a tradeoff between singlet encapsulation rate and mutiplet encapsulation rate. Different techniques can be adopted to detect doublets. If 2 cells with similar mRNA counts trapped together, then the read count effectively doubles for reads with the same cell barcode. If the 2 cells in a doublet have very different mRNA counts, then the support would be longer than either of the cells.}$$
