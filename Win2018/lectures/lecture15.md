@@ -58,16 +58,16 @@ $$E[# of collisions] = N(N-1)/2B = 77.3k $$
 
 Now we have obtained reads consisting of cell barcode, UMI and cDNA, we can estimante the transcript abundances. We first group reads by cell barcode, align cDNA reads, and then count unique molecules per cell per gene using UMI.
 
-<div class="fig figcenter fighighlight"> <img src="/Win2018/assets/lecture15/biasedreads2.png" width="60%"> <div class="figcaption">Recovering Cells by Barcode Grouping</div> </div>
+<div class="fig figcenter fighighlight"> <img src="/Win2018/assets/lecture15/biasedreads2.png" width="50%"> <div class="figcaption">Recovering Cells by Barcode Grouping</div> </div>
 </br>
 
-The final output is a gene expression table, whose columns are cells, and rows are genes. There are 2 major sources of errors. An error can occur during sequencing and synthesis of barcodes, or each droplet can accidentally capture more than one cell. If the error occurs during sequencing, since the barcode is short, we can simply filter out the erroneous barcodes by choosing the ones with many read counts. For the case where a droplet captures more than one cell, we can model droplet arrivals with Poisson distribution. The parameter $$\lambda$$ is controlled by the concentration of the cells, all else being the same. There is a tradeoff between singlet encapsulation rate and mutiplet encapsulation rate. Different techniques can be adopted to detect doublets. If 2 cells with similar mRNA counts trapped together, then the read count effectively doubles for reads with the same cell barcode. If the 2 cells in a doublet have very different mRNA counts, then the support would be longer than either of the cells.
+$$\text{The final output is a gene expression table, whose columns are cells, and rows are genes. There are 2 major sources of errors. An error can occur during sequencing and synthesis of barcodes, or each droplet can accidentally capture more than one cell. If the error occurs during sequencing, since the barcode is short, we can simply filter out the erroneous barcodes by choosing the ones with many read counts. For the case where a droplet captures more than one cell, we can model droplet arrivals with Poisson distribution. The parameter }\lambda\text{ is controlled by the concentration of the cells, all else being the same. There is a tradeoff between singlet encapsulation rate and mutiplet encapsulation rate. Different techniques can be adopted to detect doublets. If 2 cells with similar mRNA counts trapped together, then the read count effectively doubles for reads with the same cell barcode. If the 2 cells in a doublet have very different mRNA counts, then the support would be longer than either of the cells.}$$
 
 
-<div class="fig figcenter fighighlight"> <img src="/Win2018/assets/lecture15/tradeoff.png" width="50%"> <div class="figcaption"> </div>Choosing a Desgin Point </div>
+<div class="fig figcenter fighighlight"> <img src="/Win2018/assets/lecture15/tradeoff.png" width="40%"> <div class="figcaption"> </div>Choosing a Desgin Point </div>
 </br>
 ###<a id='future'></a>Outlook
 
-While the sequencing cost is decreasing, the number of single-cell studies increases exponentially. To put the cost into perspective , suppose we sequence 1M cells with 50k reads per cell, $$10(-5)$$ USD per read, then the overall cost is 500k.
+While the sequencing cost is decreasing, the number of single-cell studies increases exponentially. To put the cost into perspective , suppose we sequence 1M cells with 50k reads per cell, 0.00001 USD per read, then the overall cost is 500k.
 <div class="fig figcenter fighighlight"> <img src="/Win2018/assets/lecture15/future.png" width="80%"> <div class="figcaption"> </div> </div>
 </br>
