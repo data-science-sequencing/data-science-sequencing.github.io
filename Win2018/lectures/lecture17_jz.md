@@ -14,9 +14,8 @@ Tuesday 6 March 2018
 ### Topics
 
 1. <a href='#mt'>Multiple testing</a>
-  - <a href='#bh'>Benjamini-Hochberg test</a>
-  - <a href='#math'>Justifying the BH test</a>
-3. <a href='#bayes'>Empirical Bayes theory</a>
+2. <a href='#bh'>Benjamini-Hochberg test</a>
+3. <a href='#math'>Justifying the BH test</a>
 
 ### <a id='mt'></a>Multiple testing
 
@@ -41,7 +40,7 @@ $$ FWER \leq 0.005$$
 $$ E\left[\frac{V}{\max(R, 1)} \right]$$
 where $$R$$ represents the number of discoveries. We will discuss a procedure for controlling the FDR in detail below.
 
-#### <a id='bh'></a>Benjamini-Hochberg test
+### <a id='bh'></a>Benjamini-Hochberg test
 
 Consider a list of $$p$$-values obtained from a large set of hypothesis tests (e.g. one for each transcript): $$p_1, \dots, P_m$$. The [Benjamini-Hochberg test](https://www.jstor.org/stable/2346101?seq=1#page_scan_tab_contents) was created in 1995 and consists of the following two steps:
 
@@ -62,7 +61,7 @@ Consider the following set of $$p$$-values obtained from a differential expressi
 1. Under the Bonferroni procedure with $$\alpha = 0.05$$, we make discoveries on none of the tests.
 2. Under the BH procedure with $$\alpha = 0.05$$, we make discoveries on the 1st, 2nd, 3rd, 4th, 7th, 8th, 9th, and 10th tests.
 
-#### <a id='math'></a>Justifying the BH test
+### <a id='math'></a>Justifying the BH test
 
 The BH-test, while straightforward, seems rather arbitrary at first glance. We will attempt to justify why the BH procedure is indeed valid and controls FDR at $$\alpha$$. For simplicity, we start with just one test. We know that under the null $$H_0$$, $$P \sim U[0, 1]$$ (i.e. the $$p$$-value has a uniform distribution). Under the alternate $$H_1$$, then $$P \sim f_1$$.
 
