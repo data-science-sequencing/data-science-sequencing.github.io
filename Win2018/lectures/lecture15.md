@@ -22,13 +22,19 @@ _scribed by Michelle Drews and edited by the course staff_
 
 Our course so far has followed the high-throughput sequencing pipeline:
 
-[IMAGE: tissue -> [RNASeq] -> reads -> [EM quantification] -> transcript abundances -> [Downstream analysis]]
+<div class="fig figcenter fighighlight">
+  <img src="/Win2018/assets/lecture15/Fig1_EENotes.jpg" width="50%">
+	<div class="figcaption">RNA-seq pipeline.</div>
+</div>
 
 Especially in the last few lectures, we have discussed the pipeline up to the transcript abundances in great detail. We now have several numbers describing the transcript or gene abundances of a biological sample. We can now use these numbers in downstream analysis to extract some information governing the biology of our sample.
 
 We will first talk about the problem of _differential analysis_ where we attempt to identify the genes or transcripts that distinguish the samples from two populations (e.g. two conditions before/after drug treatment). Visually, differential analysis looks like the following:
 
-[IMAGE: abundances from A, abundances from B -> differential analysis -> which transcripts are expressed differentially in A and B]
+<div class="fig figcenter fighighlight">
+  <img src="/Win2018/assets/lecture15/Fig2_EENotes.jpg" width="50%">
+	<div class="figcaption">Differntial analysis.</div>
+</div>
 
 Examples of software that handle differential analysis are [DESeq](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-10-r106) and [DESeq2](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-014-0550-8). A key idea here is the idea of _significance_. It's not enough for two expression levels to be different; we need some notion of significance to quantify whether the difference observed is actually meaningful.
 
@@ -36,7 +42,10 @@ As an aside, while we are talking about gene/transcript abundances here, we will
 
 Suppose we sequence samples from two different conditions: sample A is a control group and sample B is a group treated with a drug. Suppose we sequence the samples from each sample, quantify transcript abundances with some EM-based algorithm, and obtain the following plots:
 
-[IMAGE: Histogram 1 of abundances v. transcripts for condition A, Histogram 2 of abundances v transcripts for condition B. Transcript 1 is different and transcripts 2, 3 are the same roughly]
+<div class="fig figcenter fighighlight">
+  <img src="/Win2018/assets/lecture15/Fig3_EENotes.jpg" width="50%">
+	<div class="figcaption">Differntial analysis by eyeballing.</div>
+</div>
 
 Just by eyeballing these plots, we might immediately conclude that transcript 1 is differentially expressed and transcripts 2 and 3 are not. Note that there are no error bars on this plot, and therefore we cannot really make any strong conclusion. Perhaps the observed difference, while large, is due to some natural variation and not due to the drug. With only one sample in each population, we cannot get error bars, which capture a sense of the variation in the estimate.
 
@@ -62,7 +71,7 @@ The $$n-1$$ here (rather than $$n$$) ensures that our variance estimator is unbi
 
 #### <a id='classical'></a> Classical statistics approach and the _p_-value
 
-Assuming we have more than one replicate in each condition, we can draw error bars for each transcript. Using the estimated mean and standard deviation, we would like to test if the two populations are different. This problem was originally solved by [Ronald Fisher](https://en.wikipedia.org/wiki/Ronald_Fisher), who introduced the idea of a [_p_-value](https://en.wikipedia.org/wiki/P-value):
+Assuming we have more than one replicate in each condition, we can draw error bars for each transcript. Using the estimated mean and standard deviation, we would like to test if the two populations are different. This problem was originally solved by [RA Fisher](https://en.wikipedia.org/wiki/Ronald_Fisher), who introduced the idea of a [_p_-value](https://en.wikipedia.org/wiki/P-value):
 
 [IMAGE: muA & sigmaA, muB & sigmaB -> [testing] -> p-value]
 
