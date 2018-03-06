@@ -21,7 +21,7 @@ Thursday 1 March 2018
 
 
 ### <a id='motivation'></a>Motivation
-In previous lectures, we discussed bulk RNA-seq, at a high level can be described by: sample &rarr; cell lysis &rarr; reverse transcription &rarr; amplification &rarr; sequencing &rarr; read-alignment &rarr; quantification &rarr; transcript population.
+In previous lectures, we discussed bulk RNA-seq, which at a high level can be described by: sample &rarr; cell lysis &rarr; reverse transcription &rarr; amplification &rarr; sequencing &rarr; read-alignment &rarr; quantification &rarr; transcript population.
 
 Since multiple cells were lysed together, the transcript abundance we get at the final step is a population average of all cells in the sample. This prevents us from differentiating between changes in regulation within cells and compostion of the sample of cells. We also lose cell differentiation information as the cells in a sample have various differentiation rates and are therefore in different stages of differentiation.
 
