@@ -33,7 +33,7 @@ each transcript, which we want to estimate. Using maximum likelihood (ML), we ca
 infer the most likely estimate of $$\rho$$ based on the data $$Y$$. Using the ML
 formula, we would get the following,
 
-$$\rho_{ML} = \max_\rho \log P(Y;\rho)$$
+$$\hat{\rho}_{ML} = \text{argmax}_\rho \log P(Y;\rho)$$
 
 
 However, this
@@ -41,23 +41,21 @@ formula is computationally intractable. We would like to infer $$\rho$$ based
 on the data, but $$Y$$ inherently depends on $$\rho$$.
 Therefore, we try to solve an easier problem.
 
-Let $$Z$$ be a hidden variable that represents the transcript from which a read
-comes from. For now, let's assume we knew $$Z$$. If we did, we will see that
-ML inference becomes a lot easier. If we knew $$Z$$, we could write the ML problem
-we would like to solve as:
+Let $$Z = (Z_{ik})$$ be a hidden variable such that $$Z_{ik} = 1$$ if read $$i$$ comes from transcript $$k$$. If we knew $$Z$$, we will see that
+ML inference becomes a lot easier, and we could write the ML problem as:
 
-$$\rho_{ML} = \max_\rho \log P(Y,Z;\rho)$$
+$$\hat{\rho}_{ML} = \text{argmax}_\rho \log P(Y,Z;\rho)$$
 
 Using the
 chain rule to expand this joint probability, we get that:
 
-$$\rho_{ML} = \max_\rho \log P(Y|Z;\rho)P(Z;\rho)$$
+$$\hat{\rho}_{ML} = \text{argmax}_\rho \log P(Y|Z;\rho)P(Z;\rho)$$
 
 Since $$P(Y|Z)$$ has no
 dependence on $$\rho$$, we can treat it as a constant and rewrite the expression
 above as maximizing only the second term:
 
-$$\rho_{ML} = \max_\rho \log P(Z;\rho)$$
+$$\hat{\rho}_{ML} = \text{argmax}_\rho \log P(Z;\rho)$$
 
 But what is $$P(Z;\rho)$$ and is it tractable? Assuming all transcripts are the
 same length, we can rewrite $$P(Z;\rho)$$ as follows:
@@ -72,61 +70,26 @@ we get the following:
 $$P(Z;\rho) = \sum_{k=1}^K\sum_{i=1}^N Z_{ik} \log(\rho_k)$$
 
 Notice that in this expression, each transcript contributes one log term and
-$$\sum_{i=1}^N Z_ik$$ is the number of reads sampled from transcript $$k$$.
+$$\sum_{i=1}^N Z_{ik}$$ is the number of reads sampled from transcript $$k$$.
 This expression is computationally tractable. Therefore if we knew $$Z$$,
-we would be able to solve for $$\rho_{ML}$$.  
+we would be able to solve for $$\hat{\rho}_{ML}$$. This is the same as the estimation problem for when all reads are uniquely mapped. By revealing $$Z$$, one converts the multiple mapping problem to a unique mapping problem.
 
-But we don't know $$Z$$. So what do we do? We can use EM to maximize both $$\rho$$
-and $$Z$$ iteratively. Why does this work?
+But because we don't know $$Z$$, we can use EM to maximize both $$\rho$$ and $$Z$$ iteratively. Why does this work?
 Notice that in the original ML formula, we had that:
 
 $$\rho_{ML} = \max_\rho \log P(Y;\rho)$$
 
 This is essentially equivalent to marginalizing $$Z$$ out of the sum
 (computationally intractable), which can be approximated as maximizing over the
-joint probability of $$Y$$ and $$Z_{MAP}$$ where MAP is the maximum a
-posterior estimate of $$Z$$.
+joint probability of $$Y$$ and $$Z_{MAP}$$ where $$Z_{MAP}$$ is the _maximum a
+posteriori_ estimate of $$Z$$ given $$Y$$.
 
-$$ \rho_{ML} = \max_\rho \log P(Y;\rho) = \sum_Z \max_\rho \log P(Y,Z;\rho) \sim \max_\rho \log P(Y,Z_{MAP};\rho)$$
+$$ \hat{\rho}_{ML} = \text{argmax}_\rho \log P(Y;\rho) = \text{argmax}_\rho \log \sum_Z P(Y,Z;\rho) \approx \text{argmax}_\rho \log P(Y,Z_{MAP};\rho)$$
+
+However, this is a chicken and egg problem since computing $$Z_{MAP}$$ requires knowledge of $$\rho$$.
 
 
 ### <a id='hs'></a>Hard vs Soft EM
-
-For the expectation-maximization (EM) framework, we have data $$Y$$, unknowns $$\rho$$, and some hidden variables $$Z$$. In the context of RNA-Seq, we continue to assume that all transcript lengths are the same length. Recall that the EM algorithm consists of two steps:
-
-1. E-step: compute
-$$P(Z|Y; \rho^{(m)})$$
-2. M-step:
-$$\max_{\rho} E_{P(Z|Y; \rho^{(m)})} [\log P(Y, Z; \rho)] \rightarrow \rho^{(m+1)}$$
-
-When viewing this problem from a maximum likelihood (ML) perspective, we need to solve the optimization problem
-$$\max_{\rho} \log P(Y; \rho).$$
-
-We can simplify this problem by introducing hidden variables $$Z$$, resulting in
-
-$$ \max_\rho \log(P(Y, Z; \rho)) = \max_\rho \log(P(Z; \rho) P(Y|Z; \rho)) \iff \max_\rho \log P(Z; \rho) $$
-
-where we exploited the fact that
-$$P(Y | Z; \rho) = 1$$. Now,
-
-$$P(Z; \rho) = \prod_{i=1}^N \prod_{k=1}^K \rho_k^{Z_{ik}} $$
-
-where $$Z_{ik} = 1$$ if read $$i$$ comes from transcript $$k$$. Note that this product will consist of exactly one $$\rho$$ term since read $$i$$ can only equal come from one transcript. Therefore
-
-$$\log P(Z; \rho) = \log \prod_{i=1}^N \prod_{k=1}^K \rho_k{Z_{ik}} = \sum_{k=1}^K \left(\sum_{i=1}^N z_{ik}\right) \log \rho_k$$
-
-We introduce $$Z$$ into the problem to remove the original ambiguity; however we do not know the value of $$Z$$. Going back to the original ML problem
-
-$$
-\begin{align*}
-& \max_\rho \log P(Y; \rho) \\
-= & \max_\rho \log \sum_Z P(Y, Z; \rho)
-\end{align*}
-$$
-
-which gives us
-
-$$\rho^{(m)} \rightarrow \max_Z P(Y, Z; \rho^{(m)}) = \max_Z P(Z| Y; \rho^{(m)}) P(Y; \rho^{(m)}) $$
 
 We start with some initial value for $$\rho$$ called $$\rho^{(m)}$$. Given these values of $$\rho$$, we find the values of $$Z$$ that maximizes the probability in the objective (_maximum a posteriori_).
 
@@ -295,6 +258,6 @@ $$k$$-mer overlap graph:
 	<div class="figcaption">Pseudo-alignment figure from kallisto paper.</div>
 </div>
 
-This strategy, known as _pseudo-alignment_ is used by
+This strategy, known as _pseudo-alignment_, is used by
 [kallisto](https://www.nature.com/articles/nbt.3519) and
 [Salmon](https://www.nature.com/articles/nmeth.4197).
