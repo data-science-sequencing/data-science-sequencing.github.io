@@ -69,6 +69,8 @@ $$
 
 The $$n-1$$ here (rather than $$n$$) ensures that our variance estimator is unbiased. Note that in reality, $$n$$ scales proportionally with the cost of the experiment (sequencing is expensive!). Therefore we would like to know how large we should make our $$n$$ so that we can minimize our cost while getting a reasonable estimate of our sample variance. We will discuss this in more detail later.
 
+
+
 #### <a id='classical'></a> Classical statistics approach and the _p_-value
 
 Assuming we have more than one replicate in each condition, we can draw error bars for each transcript. Using the estimated mean and standard deviation, we would like to test if the two populations are different. This problem was originally solved by [RA Fisher](https://en.wikipedia.org/wiki/Ronald_Fisher), who introduced the idea of a [_p_-value](https://en.wikipedia.org/wiki/P-value):
@@ -100,6 +102,11 @@ We can use such a test to determine if the mean value of a transcript is the sam
 ### <a id='mt'></a> Multiple testing
 
 For each of the, say, 30000 genes, we can perform a two-sample _t_-test to determine if that gene is different between the two populations. We would therefore obtain 30000 _p_-values between 0 and 1. Intuitively, the smaller the _p_-value, the more differentially expressed the gene (the less likely we are to observe a value at least as extreme as the actual observed value under the null hypothesis). Fisher gave also gave us a _p_-value threshold 0.05 where a test is only deemed significant if it produces a _p_-value under this threshold.
+
+<div class="fig figcenter fighighlight">
+  <img src="https://imgs.xkcd.com/comics/significant.png" width="50%">
+	<div class="figcaption">XKCD chiming in on the need for correction for multiple testing.</div>
+</div>
 
 Notice that with 30000 tests running in parallel, we would expect certain genes to appear significant due to sheer randomness. A _p_-value of 0.05, after all, means that 1 in 20 samples drawn from the null distribution would appear to be significant despite being drawn from the null distribution.
 
