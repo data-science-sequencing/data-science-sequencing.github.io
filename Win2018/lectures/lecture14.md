@@ -97,7 +97,7 @@ $$ \max_\rho \log P(Y, Z_\text{map}(Y); \rho). $$
 
 This type of EM is called _hard_ EM. This inference process is attempting to estimate the hidden variable (the transcript a read comes from) for each read. If a read could potentially come from, say, 3 different transcripts, we pick the transcript with maximum probability. In _hard_ EM, we make a hard decision on the hidden variable at each iteration. The drawback with this approach is that we do know for sure that a read comes from the max-probability transcript, and it may feel a bit aggressive.
 
-Alternatively, instead of making a hard decision, we can instead average over the posterior distribution before continuing the inference step, resulting in a _soft_ version.
+Alternatively, instead of making a hard decision, we can instead average over the posterior distribution before continuing the inference step, resulting in a _soft_ version. This results in the EM algorithm we discussed in the last lecture.
 
 ### <a id='mm'></a>EM as alternative maximization
 
