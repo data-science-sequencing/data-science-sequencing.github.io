@@ -82,7 +82,7 @@ For the first kind of error, since the barcode is short, we can simply filter ou
 For the second kind of error, we can model the cell capture success rate using a Poisson process with some Poisson rate $$\lambda$$, which we tune using the concentration of cells. With a high Poisson rate (and therefore a high cell concentration), we would obtain more multiplets, less singlets, and less empty droplets. If 2 cells with similar mRNA counts get trapped together, then the read count effectively doubles for reads with the same cell barcode. If the 2 cells in a doublet have very different mRNA counts, then the transcript support would be longer than in either of the individual cells.
 
 
-<div class="fig figcenter fighighlight"> <img src="/Win2018/assets/lecture16/tradeoff.png" width="40%"> <div class="figcaption"> </div>Choosing an optimal point for balancing multiplets (green), singlets (orange), and empty droplets (blue). </div>
+<div class="fig figcenter fighighlight"> <img src="/Win2018/assets/lecture16/tradeoff.png" width="40%"> <div class="figcaption"> </div>Choosing an optimal point for balancing multiplets (green), singlets (orange), and empty droplets (blue). The Poisson rate increase monotonically with cell concentration. </div>
 
 ### <a id='future'></a>Parting thoughts
 
