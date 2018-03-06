@@ -7,7 +7,7 @@ permalink: /Win2018/lectures/lecture13/
 
 Tuesday 20 February 2018
 
-_scribed by Jacob Blum and edited by the course staff_
+_scribed by Jacob Blum, adapted from Paraskevas Deligiannis' [scribed notes](/Spr2016/lectures/lecture15/), and edited by the course staff_
 
 -----------------
 
@@ -237,7 +237,3 @@ $$
 
 
 where we have omitted the linear constraints on $$\mathbf{\rho}$$ for simplicity. One can verify that if we define $$\hat{N}_k = \sum_{i=1}^N{f_{ik}^{(m)}}$$, the above results follow readily from our analysis for the case of uniquely mapped reads. This is, after all, the reason why we use the _hidden_ variable $$Z$$.
-
----
-
-_Mostly adapted from Paraskevas Deligiannis' [scribed notes](/Spr2016/lectures/lecture15/) from the Spring 2016 iteration of this course._
