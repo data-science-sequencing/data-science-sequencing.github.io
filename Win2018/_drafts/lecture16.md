@@ -103,7 +103,7 @@ A fundamental problem here is identifying which barcodes are due to sequencing e
 
 #### <a id='errencap'></a>Encapsulation errors
 
-As the cells move through the microfluidic chip, there are a few factors we want to control. We can model the cell capture success rate using a Poisson process with some Poisson rate $$\lambda$$, which we tune using the concentration of cells in the solution we feed to the microfluidics. With a high Poisson rate (and therefore a high cell concentration), we would obtain more multiplets, less singlets, and less empty.
+As the cells move through the microfluidic chip, there are a few factors we want to control. We can model the cell capture success rate using a Poisson process with some Poisson rate $$\lambda$$, which we tune using the concentration of cells in the solution we feed to the microfluidics. With a high Poisson rate (and therefore a high cell concentration), we would obtain more multiplets, less singlets, and less empty droplets.
 
 [IMAGE: cell encapsulation plot]
 
@@ -113,6 +113,6 @@ For example, one way DropSeq was evaluated involved mixing mouse cells with huma
 
 ### <a id='conclusion'></a>Concluding remarks
 
-While sequencing cost is going down quickly (faster than Moore's law), there is also a different curve of interest that's been growing exponentially: the size of single-cell RNA-Seq experiments (in terms of number of cells) has increased exponentially. Most recently, [1.3 million cells](https://community.10xgenomics.com/t5/10x-Blog/Our-1-3-million-single-cell-dataset-is-ready-to-download/ba-p/276) have been sequenced by 10X genomics. At approximately $0.00001 per read, this would cost on the order of half a million dollars. Sequencing cost is becoming the bottleneck again.
+While sequencing cost is going down quickly (faster than Moore's law), there is also a different curve of interest that's been growing exponentially: the size of single-cell RNA-Seq experiments (in terms of number of cells). Most recently, [1.3 million cells](https://community.10xgenomics.com/t5/10x-Blog/Our-1-3-million-single-cell-dataset-is-ready-to-download/ba-p/276) have been sequenced by 10X genomics. At approximately $0.00001 per read, this would cost on the order of half a million dollars. Sequencing cost is becoming the bottleneck again.
 
 [IMAGE: Perspective curve]
