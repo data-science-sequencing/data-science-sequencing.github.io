@@ -295,6 +295,6 @@ $$k$$-mer overlap graph:
 	<div class="figcaption">Pseudo-alignment figure from kallisto paper.</div>
 </div>
 
-This strategy, known as _pseudo-alignment_ is used by the tool
+This strategy, known as _pseudo-alignment_ is used by
 [kallisto](https://www.nature.com/articles/nbt.3519) and
 [Salmon](https://www.nature.com/articles/nmeth.4197).
