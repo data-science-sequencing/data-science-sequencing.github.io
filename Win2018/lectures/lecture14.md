@@ -8,8 +8,7 @@ permalink: /Win2018/lectures/lecture14/
 
 Tuesday 20 February 2018
 
-_scribed by Mira Moufarrej, with the EM part adapted from Paraskevas Deligiannis'
-[scribed notes](/Spr2016/lectures/lecture15/), and edited by the course staff_
+_scribed by Mira Moufarrej and edited by the course staff_
 
 -----------------
 
@@ -24,17 +23,17 @@ _scribed by Mira Moufarrej, with the EM part adapted from Paraskevas Deligiannis
 ### <a id='int'></a>Estimating RNA Abundance
 When we sequence RNA, we would like to quantify the abundances of distinct transcripts.
 As we have seen previously, NGS yields short reads that can map back to multiple transcripts.
-For instance, if we have a read composed of an exon $B$, and we have two transcripts where
-transcript 1 is $ABC$ and transcript 2 is $BCD$, the read maps to both transcripts
-1 and 2. This is known as the multiple mapping problem.  
+For instance, if we have a read composed of an exon $$B$$, and we have two transcripts where
+transcript 1 is $$ABC$$ and transcript 2 is $$BCD$$, the read maps to both transcripts
+1 and 2. This is known as the _multiple mapping problem_.  
 
 Here, we want to infer each transcript's abundance based on the read data.
 Let $$Y$$ be the data (reads). Let $$\rho$$ be a vector of unknown abundances for
-each transcript, which we want to estimate. Using maximum likelihood, we can
+each transcript, which we want to estimate. Using maximum likelihood (ML), we can
 infer the most likely estimate of $$\rho$$ based on the data $$Y$$. Using the ML
 formula, we would get the following,
 
-$$\rho_{ML} = max_\rho logP(Y;\rho)$$
+$$\rho_{ML} = \max_\rho \log P(Y;\rho)$$
 
 
 However, this
@@ -47,18 +46,18 @@ comes from. For now, let's assume we knew $$Z$$. If we did, we will see that
 ML inference becomes a lot easier. If we knew $$Z$$, we could write the ML problem
 we would like to solve as:
 
-$$\rho_{ML} = max_\rho log P(Y,Z;\rho)$$
+$$\rho_{ML} = \max_\rho \log P(Y,Z;\rho)$$
 
 Using the
 chain rule to expand this joint probability, we get that:
 
-$$\rho_{ML} = max_\rho log P(Y|Z;\rho)P(Z;\rho)$$
+$$\rho_{ML} = \max_\rho \log P(Y|Z;\rho)P(Z;\rho)$$
 
 Since $$P(Y|Z)$$ has no
 dependence on $$\rho$$, we can treat it as a constant and rewrite the expression
 above as maximizing only the second term:
 
-$$\rho_{ML} = max_\rho log P(Z;\rho)$$
+$$\rho_{ML} = \max_\rho \log P(Z;\rho)$$
 
 But what is $$P(Z;\rho)$$ and is it tractable? Assuming all transcripts are the
 same length, we can rewrite $$P(Z;\rho)$$ as follows:
@@ -70,25 +69,25 @@ comes from transcript $$k$$. If transcripts were of different lengths,
 we would scale by length. Taking the log of the expression for $$P(Z;\rho)$$,
 we get the following:
 
-$$P(Z;\rho) = \sum_{k=1}^K\sum_{i=1}^N Z_{ik} log(\rho_k)$$
+$$P(Z;\rho) = \sum_{k=1}^K\sum_{i=1}^N Z_{ik} \log(\rho_k)$$
 
 Notice that in this expression, each transcript contributes one log term and
 $$\sum_{i=1}^N Z_ik$$ is the number of reads sampled from transcript $$k$$.
 This expression is computationally tractable. Therefore if we knew $$Z$$,
 we would be able to solve for $$\rho_{ML}$$.  
 
-But we don't know $Z$. So what do we do? We can use EM to maximize both $$\rho$$
+But we don't know $$Z$$. So what do we do? We can use EM to maximize both $$\rho$$
 and $$Z$$ iteratively. Why does this work?
 Notice that in the original ML formula, we had that:
 
-$$\rho_{ML} = max_\rho log P(Y;\rho)$$
+$$\rho_{ML} = \max_\rho \log P(Y;\rho)$$
 
 This is essentially equivalent to marginalizing $$Z$$ out of the sum
 (computationally intractable), which can be approximated as maximizing over the
 joint probability of $$Y$$ and $$Z_{MAP}$$ where MAP is the maximum a
 posterior estimate of $$Z$$.
 
-$$ \rho_{ML} = max_\rho log P(Y;\rho) = \sum_Z max_\rho log P(Y,Z;\rho) \sim max_\rho log P(Y,Z_{MAP};\rho)$$
+$$ \rho_{ML} = \max_\rho \log P(Y;\rho) = \sum_Z \max_\rho \log P(Y,Z;\rho) \sim \max_\rho \log P(Y,Z_{MAP};\rho)$$
 
 
 ### <a id='hs'></a>Hard vs Soft EM
