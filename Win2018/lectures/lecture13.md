@@ -3,7 +3,7 @@ layout: page
 mathjax: true
 permalink: /Win2018/lectures/lecture13/
 ---
-## Lecture 13: RNA-seq - Quantification and the EM Algorithm
+## Lecture 13: RNA-seq - Quantification and the EM Algorithm Part 1
 
 Tuesday 20 February 2018
 
