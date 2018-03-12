@@ -12,44 +12,106 @@ _scribed by Michelle Drews and edited by the course staff_
 -----------------
 
 ## Topics
-
+1. <a href='#intro'>Introduction</a>
 1.	<a href='#diff'>Differential analysis</a>
     - <a href='#classical'>Classical statistics approach and the _p_-value</a>
 1.	<a href='#mt'>Multiple testing</a>
 
 
-### <a id='diff'></a> Differential analysis
+### <a id='intro'></a> Introduction
 
-Our course so far has followed the high-throughput sequencing pipeline:
+Prior to this lecture, we have worked out the details of an RNAseq experiment
+from tissue to transcript abundance.  Our samples of interest are lysed, the RNA
+is extracted and purified, then converted to cDNA and run through High
+Throughput Sequencing, which gives us a set of reads.  We then take the reads,
+and using the EM quantification discussed in the previous lectures, we are able
+to get transcript abundance.  
+
 
 <div class="fig figcenter fighighlight">
   <img src="/Win2018/assets/lecture15/Fig1_EENotes.jpg" width="50%">
-	<div class="figcaption">RNA-seq pipeline.</div>
+	<div class="figcaption">Overview of RNA-seq pipeline.</div>
 </div>
 
-Especially in the last few lectures, we have discussed the pipeline up to the transcript abundances in great detail. We now have several numbers describing the transcript or gene abundances of a biological sample. We can now use these numbers in downstream analysis to extract some information governing the biology of our sample.
+However, this data is somewhat useless on its own – we’d like to draw conclusions
+ about real biology from these abundances – which generally involves
+ comparing sequencing data from two different populations/treatments/etc.  
+ However, we need to be careful about how we do this, because given the large
+ number of transcripts in a given data-set, the likelihood of accepting a
+ false conclusion becomes large if we use the traditional statistics for single
+ hypothesis testing multiple times in a row.  This problem is generally referred
+ to as the
+ [Multiple Testing problem]( https://en.wikipedia.org/wiki/Multiple_comparisons_problem),
+ and is not sequencing specific – in fact, it is relevant to many areas of
+ bio-statistics, especially in the era of big data.  
 
-We will first talk about the problem of _differential analysis_ where we attempt to identify the genes or transcripts that distinguish the samples from two populations (e.g. two conditions before/after drug treatment). Visually, differential analysis looks like the following:
+
+
+### <a id='diff'></a> Differential analysis
+
+In a typical RNAseq experiment in the wild, scientists will have 2
+conditions they would like to compare.  For this example let’s pretend you’re
+Aashish Manglik, and you’ve discovered a groundbreaking new
+[painkiller](https://med.stanford.edu/news/all-news/2016/08/compound-kills-pain-as-well-as-morphine-but-may-lack-overdose-risk.html).  
+You want to see how your painkiller changes gene expression, so you do RNAseq
+on cells before your treatment, and cells after your treatment – and you want
+to know what is the difference between A and B.  The type of analysis you are
+going to do is a Differential Expression Analysis.  
+
 
 <div class="fig figcenter fighighlight">
   <img src="/Win2018/assets/lecture15/Fig2_EENotes.jpg" width="50%">
-	<div class="figcaption">Differntial analysis.</div>
+	<div class="figcaption">Overview of Differential Analysis.</div>
 </div>
 
-Examples of software that handle differential analysis are [DESeq](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-10-r106) and [DESeq2](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-014-0550-8). A key idea here is the idea of _significance_. It's not enough for two expression levels to be different; we need some notion of significance to quantify whether the difference observed is actually meaningful.
+There are many software programs available that do this kind of analysis, such as [DESeq](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-10-r106)
+and
+[DESeq2](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-014-0550-8)
+which are [R](https://www.r-project.org/) based.
+The output that we would like to get from our program is a
+quantification of which transcripts are expressed differently in A and B
+in the above figure.
 
-As an aside, while we are talking about gene/transcript abundances here, we will note that other units may be used in practice. For example, raw integer counts (e.g. molecule or read counts aligning to a particular gene) are also commonly used. The discussions here will apply to those units as well.
+However, “which transcripts are expressed differently” is not a very
+mathematically precise statement – so let’s expand on this further.  
+We’re interested in things that aren’t just different – we’re interested in
+things that are statistically different, using some statistical method.  
+Let’s start working through the analysis, and we’ll illustrate this
+example as we go.  
 
-Suppose we sequence samples from two different conditions: sample A is a control group and sample B is a group treated with a drug. Suppose we sequence the samples from each sample, quantify transcript abundances with some EM-based algorithm, and obtain the following plots:
+We start the analysis with transcript counts for each condition from our
+EM algorithm (Salmon or Kallisto or RSEM or Cufflinks, or others).  
+In practice, this can be a count of the number of reads per transcript
+or number of reads mapped to a particular gene (remember: a gene can have
+multiple transcripts), or an abundance metric for each transcript.  
+All these data are roughly equivalent with each other, since counts
+are just scaled abundances and the math is the same for transcripts
+and genes – there’s just more transcripts than genes.  
+
+Suppose the output of this is the following (say A being a control
+and B being a treatment group).
 
 <div class="fig figcenter fighighlight">
   <img src="/Win2018/assets/lecture15/Fig3_EENotes.jpg" width="50%">
-	<div class="figcaption">Differntial analysis by eyeballing.</div>
+	<div class="figcaption">Differential analysis by eyeballing.</div>
 </div>
 
-Just by eyeballing these plots, we might immediately conclude that transcript 1 is differentially expressed and transcripts 2 and 3 are not. Note that there are no error bars on this plot, and therefore we cannot really make any strong conclusion. Perhaps the observed difference, while large, is due to some natural variation and not due to the drug. With only one sample in each population, we cannot get error bars, which capture a sense of the variation in the estimate.
+Just looking at this data, with our patented
+[iBall technique](https://en.wikipedia.org/wiki/Visual_inspection#Humorous_terminology)
+– it looks like transcript 1 seems to be responding to the drug.  
+However, can we really say this is true?  No!  We need error bars!
 
-We will assume that we have more than one sample in the form of experimental _replicates_ (repeated sampling from the same condition). Assume we have $$n$$ replicates. Let $$X_i^A$$ represent the abundance of transcript $$i$$ under condition $$A$$. We can estimate the mean abundance for each population as
+Both A and B can be thought of as outputs from a random variable.  
+That is, we can’t make any conclusions from one sample because we
+don’t have information on the variance!  
+
+Therefore for each transcript we want $$n$$ replicates
+(repeated sampling from the same condition),
+and would like to calculate the mean and variance.  
+
+If I have a single transcript x that I am interested in,
+and I have n replicates in condition A and condition B, then
+the math looks something like this:
 
 $$
 \begin{align*}
@@ -67,60 +129,178 @@ $$
 \end{align*}
 $$
 
-The $$n-1$$ here (rather than $$n$$) ensures that our variance estimator is unbiased. Note that in reality, $$n$$ scales proportionally with the cost of the experiment (sequencing is expensive!). Therefore we would like to know how large we should make our $$n$$ so that we can minimize our cost while getting a reasonable estimate of our sample variance. We will discuss this in more detail later.
+Statistics side note: the $$\frac{1}{n-1}$$ in this formula makes it unbiased!
+
+Now, theoretically more $$n$$ is better $$n$$, however in real life,
+High Throughput Sequencing is expensive and your n costs money!  
+In the wild, 3 is not an uncommon n, and this creates some problems
+because there is an uncertainty in the variance term calculated above as well.  
+
+To expand on this – it’s important to note that sigma is an **estimate**
+of the true variance, and therefore it too is a random variable!  As we know,
+any random variable has a variance, including the estimated  variance – and
+interestingly, the variance of the estimated variance is significantly bigger
+than the variance itself (said another way: the variance of the estimated
+variance is larger than the variance of the mean).  
+
+When your $$n = 3$$, your variance isn’t accurate!  How do we deal with this?  
+There is a method, which we will discuss in a later lecture.  
+
+However – for the sake of continuing, let’s assume we have a
+reasonable vestimated mu and sigma.  
+
+Now we have height and error-bars on our graph, great!
+
+<div class="fig figcenter fighighlight">
+  <img src="/Win2018/assets/lecture15/Fig6_EENotes.jpg" width="50%">
+	<div class="figcaption">Differential analysis with errorbars.</div>
+</div>
 
 
+Now all we need is a test to see if transcript 1 is expressed significantly
+different in the two conditions.  The output of this test should give an
+indication of significant difference, and the magnitude of how significantly
+different are they?
 
-#### <a id='classical'></a> Classical statistics approach and the _p_-value
+As it turns out RA Fisher, in 1905 came up with the notion of the
+[p-value]( https://en.wikipedia.org/wiki/Fisher%27s_exact_test),
+which we’ll be using today.  
 
-Assuming we have more than one replicate in each condition, we can draw error bars for each transcript. Using the estimated mean and standard deviation, we would like to test if the two populations are different. This problem was originally solved by [RA Fisher](https://en.wikipedia.org/wiki/Ronald_Fisher), who introduced the idea of a [_p_-value](https://en.wikipedia.org/wiki/P-value):
+The p-value is a number between 0-1 and represents the
+probability that we reject the null hypothesis, even though it is true.  
+A p-value is nice in that it requires no modeling of what happens under
+the alternate hypothesis.  It tests the null hypothesis.  
 
-[IMAGE: muA & sigmaA, muB & sigmaB -> [testing] -> p-value]
+So what is a null hypothesis?  To illustrate, we’ll walk through the
+steps of how to do a T-Test.
 
-Critically, the notion of a $$p$$-value only makes sense in the context of a null hypothesis. Consider the following procedure
+How to do a T-Test:
 
-1. Calculate a statistic $$T$$
-2. Set a null hypothesis: abundances in A & B have the same distribution
-3. Under the null, suppose $$T \sim G$$ where $$G$$ is a cumulative distribution function (CDF). Then $$p = 1-G(T)$$
+1.	Observe data and use it to calculate the T-statistic (more on this coming up)
 
-In other words, the _p_-value is the probability that statistic described by the null distribution exceeds the observed statistic. Typically, $$G$$ is known (e.g. normal with the same mean and variance across the two populations).
+2.	Set the null hypothesis:
 
-**Example**
+    a.	In our case this is that the distribution of abundances from A and B are the same!
+
+3.	Calculate the  p-value where $$G(x)$$
+is the CDF of the distribution of
+p-values under the null distribution;  
+the p-value is $$1-G(T)$$
+
+    a.	NB: in some situations the  p-value is $$G(T)$$
+    itself depending on what tail of the distribution you’re interested in.  
+
+    b.	What are you computing here?  You’re computing the
+    probability that the T statistic exceeds the calculated value
+
+    c.	Note that when you’re very different –
+    the magnitude of the T value will be large!
+
+Note: Under the null hypothesis, G has a uniform distribution (here’s a cute
+little proof from a blog if you don’t believe me:
+[p-value proof](https://joyeuserrance.wordpress.com/2011/04/22/proof-that-p-values-under-the-null-are-uniformly-distributed/) )
+
+Okay, now how do we calculate our statistic?  It’s important to note that there
+are many statistics other statistics besides the T statistic we will illustrate
+here, which all make different assumptions and are useful in different situations.
 
 $$T \triangleq \frac{\sqrt{n}(\hat{\mu}^A-\hat{\mu}^A)}{\sqrt{(\hat{\sigma}^A)^2 + (\hat{\sigma}^A)^2}} $$
 
-The statistic here is known as the _t_-statistic and is used for a _two-sample t-test_. Under the null hypothesis, we assume
+The statistic here is known as the _t_-statistic and is used for a
+_two-sample t-test_. Under the null hypothesis, we assume
 
 $$ X_i^A, X_i^B \sim N(\mu, \sigma^2), $$
 
-in which case $$p \sim U[0, 1]$$, a uniform distribution between 0 and 1.
+in which case $$p \sim U[0, 1]$$, a uniform
+distribution between 0 and 1.
 
-**Fact**: $$Y$$ with cdf $$F(y) \triangleq \text{Pr}(Y \leq y) $$, then $$F(Y) = Z U[0, 1]$$.
+**Fact**: $$Y$$ with cdf $$F(y) \triangleq \text{Pr}(Y \leq y) $$,
+then $$F(Y) = Z U[0, 1]$$.
 
-We can use such a test to determine if the mean value of a transcript is the same between conditions A and B based on the _p_-value obtained. While we only described one statistic here, there are several types of statistics one could use depending on the assumptions one would like to make on the null hypothesis (e.g. non-equal variance).
+We can use such a test to determine if the mean value of a transcript is the
+same between conditions A and B based on the _p_-value obtained. While we only
+described one statistic here, there are several types of statistics one could
+use depending on the assumptions one would like to make on the null hypothesis
+(e.g. non-equal variance).
+
+<div class="fig figcenter fighighlight">
+  <img src="/Win2018/assets/lecture15/Fig8_EENotes.png" width="50%">
+	<div class="figcaption">Differential analysis of a transcript.</div>
+</div>
+
+If we have a small p-value, then we are more interested in the transcript
+we’ve made a discovery!  It is unlikely that we saw this difference and
+the distributions are actually the same ($$i.e.$$ they belong to the null).
 
 ### <a id='mt'></a> Multiple testing
 
-For each of the, say, 30000 genes, we can perform a two-sample _t_-test to determine if that gene is different between the two populations. We would therefore obtain 30000 _p_-values between 0 and 1. Intuitively, the smaller the _p_-value, the more differentially expressed the gene (the less likely we are to observe a value at least as extreme as the actual observed value under the null hypothesis). Fisher gave also gave us a _p_-value threshold 0.05 where a test is only deemed significant if it produces a _p_-value under this threshold.
+What is the threshold at which we think we’ve made a discovery?  
+According to RA Fisher, 0.05 is a good threshold.  
+This means that there’s only a 5% chance that the T statistic
+we observed was actually from the null distribution.  However,
+when RA Fisher invented this test he was testing only one hypothesis,
+not ~30k hypotheses like we are with RNAseq!  
+
+When we have 30k hypotheses, false positives become an issue!  
+That is to day, by random chance, you will see some transcripts
+that look positive just due to random fluctuations.  By definition,
+the p-value of 0.05 represents the chance that we will reject the null
+hypothesis when it is actually true.  If we do this 30k times, this means
+we will have ~1.5k false positives!  Therefore you can’t use 0.05 on
+each test independently!
+
+This then brings us to the last portion of differential analysis.  
+You’re not just testing one hypothesis; you’re testing many in parallel.  
+You’re also not testing the hypotheses against teach other, just doing many
+tests!  
+
+Framing this in terms of discoveries – we then have 2 types of possible
+discoveries under this type of analysis:
+
+1.	True discoveries (TDs)
+
+2.	False discoveries (FDs)
+
+We need a procedure to keep our False Discoveries
+low so we don’t have any Fake News!  
+
 
 <div class="fig figcenter fighighlight">
   <img src="https://imgs.xkcd.com/comics/significant.png" width="50%">
 	<div class="figcaption">XKCD chiming in on the need for correction for multiple testing.</div>
 </div>
 
-Notice that with 30000 tests running in parallel, we would expect certain genes to appear significant due to sheer randomness. A _p_-value of 0.05, after all, means that 1 in 20 samples drawn from the null distribution would appear to be significant despite being drawn from the null distribution.
 
-Let $$m = $$ the number of transcripts. Let $$H_i$$ represent the null hypothesis that transcript $$i$$ is not expressed differentially, and let $$p_i$$ be the associated _p_-value. A _discovery_ indicates a transcript found to be significant. We would like to introduce some sort of correction to reduce the amount of _false discoveries_ (i.e. incorrect rejections of the null hypothesis) without significantly compromising the amount of _true discoveries_.
+Let’s say $$V$$ is our number of FDs.  If we do m tests, and
+make $$R$$ discoveries, some of those discoveries will be FDs
 
-Let $$V = $$ total number of false discoveries. One way of controlling $$V$$ is by controlling the probability that we get at least one false discovery, also known as the _family-wise error rate_ (FWER):
+One way of controlling $$V$$, is to make sure that the probability
+of having $$1$$ or more FD is very small.  
+So instead of the threshold $$0.05$$
+for each individual test, let’s require a
+p-value of less than $$0.05$$, such that $$V$$ is controlled in regards to the
+$$m$$ tests we’re about to do. This is called controlling
+the  _family-wise error rate_ (FWER):
 
 $$ \text{Pr}[V \geq 1] \leq 0.05.$$
 
-Note that this event is a union of the events of making false discover in the first test, or the second test, or the $$n$$-th test. If we say that
+How do I change the threshold to satisfy this final goal?
 
-$$ P_i \leq \theta$$
+The answer is that we need to bound this probability –
+and we can calculate a direct bound w/o assuming independence of the individual tests.  
 
-then the probability of falsely rejecting the null is $$\theta$$. Taking a union, we getting
+For each test, what is the probability that we make a FD? Let’s call this FD1, FD2, FD3, etc.
+Then, by union bound, the probability that we make at least one FD is
+bounded by the sum of the FD probabilities of each test: FD1, FD2, FD3, etc.  
+
+We make a discovery when our p-value is less than theta, which is our
+more stringent criteria than 0.05.
+
+We then ask, with what theta is the probability I reject the null less than
+$$0.05$$, and we can make our lives easier by noting that since p is
+uniformly distributed, theta is the probability of making a FD.  
+
+Therefore, the upper bound is the union of all events
 
 $$
 \begin{align*}
@@ -130,10 +310,49 @@ $$
 \end{align*}
 $$
 
-The procedure of dividing $$\theta$$ by $$m$$ is known as the _bonferroni correction_. The resulting threshold is perhaps too conservative in practice, but it's the price we must pay in order to guarantee that in 10000s of tests, we have almost no false discoveries. A fundamental question here is: would making no discoveries under this stringent criteria be better than making a few false discoveries in addition to some true discoveries?
 
-In 1995, [Benjamini and Hochberg](https://www.jstor.org/stable/2346101) proposed looking the _false discovery rate_ (FDR) instead of the FWER. Letting $$T = $$ the total number of discoveries,
+So if m is $$10,000$$ our adjusted theta p-value becomes $$5x10-6$$!  
+This is called a _Bonferroni Correction_, and $$P(V >0)$$ is called the
+family wise error rate (FWER).
 
-$$ \text{FDR} \triangleq E \left[ \frac{V}{R} \right]. $$
+We then set the threshold for discovery to be $$5x10-6$$ and we’re in business!  
+However this is a very conservative threshold -> it’s very hard to write up a
+paper with this number, we’re unlikely to get such a small p-value.
 
-With FDR $$ \leq 0.05 $$, we would be saying that of the discoveries we have reported, 5% of them are false. Of course, we do not know which ones are false. Note that both $$V$$ and $$R$$ are random variables, and therefore we need to take an expectation. Importantly, Benjamini and Hochberg does not only give us a new metric to control, but also a procedure for controlling the metric. We will discuss this in further detail next time.
+This then leaves us with a problem: This condition is too stringent…
+
+Let’s re-visit our prerequisites then.  Is it really so bad to make a False
+Discovery?  According to a well cited
+[Benjamini-Hochberg paper in 1995]( https://www.jstor.org/stable/2346101?seq=1#page_scan_tab_contents),
+we can relax our expectation that we never make a false discovery,
+as long as proportional to all our real discoveries,
+the false discoveries are small.  
+
+As above, let R be the total number of discoveries.  
+We then define a False Discovery Proportion (FDP) such that
+
+$$FDP =V/R$$
+
+where $$V$$ is still our number of FDs.
+
+
+It’s okay for $$V > 1$$ as long as it is smaller than $$R$$
+– that is to say as long as we keep our FDR < 5% we still
+find a good number of targets to chase and don’t waste NIH money too much.  
+
+However you should be aware that this is just   $$V/R$$ is still a
+random variable – and the data generated from a random process is also random.  
+We can’t guarantee the random variable is less than a threshold for sure.
+
+So the FDR is actually defined to be the expectation of this random variable:
+
+$$ \text{FDR} \triangleq E \left[ \frac{V}{\max(1,R)} \right]. $$
+
+Note: we assume $$R$$ is nonzero. Thus replace $$R$$ by $$\max(R,1)$$.
+
+This is less conservative, and will actually get us some
+reasonable data to work with, yay!
+
+So how do you control FDR to be less than $$5\%$$?  You define a new metric
+and procedure to guarantee that the FDR is less than $$5 \%$$,
+which we will explore next lecture!
