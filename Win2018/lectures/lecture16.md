@@ -3,7 +3,7 @@ layout: page
 mathjax: true
 permalink: /Win2018/lectures/lecture16/
 ---
-## Lecture 16: Introduction to Single Cell RNA-Seq
+## Lecture 16: Single Cell RNA-Seq - Introduction
 
 Thursday 1 March 2018
 

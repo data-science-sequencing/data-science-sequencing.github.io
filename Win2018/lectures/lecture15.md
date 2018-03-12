@@ -183,8 +183,7 @@ How to do a T-Test:
     a.	In our case this is that the distribution of abundances from A and B are the same!
 
 3.	Calculate the  p-value where $$G(x)$$
-is the CDF of the distribution of
-p-values under the null distribution;  
+is the CDF of the distribution of the absolute value of the T-statistic under the null distribution;  
 the p-value is $$1-G(T)$$
 
     a.	NB: in some situations the  p-value is $$G(T)$$
