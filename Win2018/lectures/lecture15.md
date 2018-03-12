@@ -13,9 +13,8 @@ _scribed by Michelle Drews and edited by the course staff_
 
 ## Topics
 1. <a href='#intro'>Introduction</a>
-1.	<a href='#diff'>Differential analysis</a>
-    - <a href='#classical'>Classical statistics approach and the _p_-value</a>
-1.	<a href='#mt'>Multiple testing</a>
+1. <a href='#diff'>Differential analysis</a>
+1. <a href='#mt'>Multiple testing</a>
 
 
 ### <a id='intro'></a> Introduction
