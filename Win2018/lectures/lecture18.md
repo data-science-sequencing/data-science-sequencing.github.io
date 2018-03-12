@@ -21,7 +21,7 @@ Thursday 8 March 2018
 
 We have a $$m$$-hypothesis testing problem where we test whether each transcript is differentially expressed or not in condition $$A$$ vs condition $$B$$. We obtain $$m$$ $$p$$-values from $$m$$ statistical tests (one for each transcript), and we want to know which transcripts are actually differentially expressed.
 
-One approach for justifying the Benjamini-Hochberg (BH) procedure is by viewing the $$p$$-values as drawings of some random variable $$P$$ an underlying distribution $$F$$. Recall that under the null hypothesis, the $$p$$-value be distributed $$U[0, 1]$$. Under the alternate hypothesis, the $$p$$-value will come from the some non-uniform (but unknown) distribution. The BH procedure attempts to estimate an empirical distribution $$\hat{F}$$ from the data.
+One approach for justifying the Benjamini-Hochberg (BH) procedure is by viewing the $$p$$-values as drawings of some random variable $$P$$ from an underlying distribution $$F$$. Recall that under the null hypothesis, the $$p$$-value be distributed $$U[0, 1]$$. Under the alternate hypothesis, the $$p$$-value will come from the some non-uniform (but unknown) distribution. The BH procedure attempts to estimate an empirical distribution $$\hat{F}$$ from the data.
 
 Once $$\hat{F}$$ is computed, we can perform a transcript-by-transcript test where we evaluate if $$p_i \leq \theta$$ for some decision threshold $$\theta$$. From the discussion [last lecture](/Win2018/lectures/lecture17/), we showed how $$\theta$$ can be obtained using the expression
 
