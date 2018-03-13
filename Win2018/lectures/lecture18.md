@@ -3,7 +3,7 @@ layout: page
 mathjax: true
 permalink: /Win2018/lectures/lecture18/
 ---
-## Lecture 18: Empirical Bayes and Principal Component Analysis
+## Lecture 18: Empirical Bayes and Single-Cell RNA-Seq Analysis
 
 Thursday 8 March 2018
 
@@ -13,17 +13,20 @@ Thursday 8 March 2018
 
 ### Topics
 
-1. <a href='#fdr'>Recap of False Discovery Rate</a>
 1. <a href='#eb'>Empirical Bayes</a>
-1. <a href='#pca'>Principal component analysis</a>
+  - <a href='#fdr'>Recap of false discovery rate</a>
+  - <a href='#da'>Replicates in differential analysis</a>
+1. <a href='#scrna'>Single-cell RNA-Seq analysis</a>
 
-### <a id='fdr'></a>Recap of False Discovery Rate
+### <a id='eb'></a>Empirical Bayes
 
-We have a $$m$$-hypothesis testing problem where we test whether each transcript is differentially expressed or not in condition $$A$$ vs condition $$B$$. We obtain $$m$$ $$p$$-values from $$m$$ statistical tests (one for each transcript), and we want to know which transcripts are actually differentially expressed.
+#### <a id='fdr'></a>Recap of false discovery rate
+
+We have $$m$$ hypothesis testing problems where we test whether each transcript is differentially expressed or not in condition $$A$$ vs condition $$B$$. We obtain $$m$$ $$p$$-values from $$m$$ statistical tests (one for each transcript), and we want to know which transcripts are actually differentially expressed.
 
 One approach for justifying the Benjamini-Hochberg (BH) procedure is by viewing the $$p$$-values as drawings of some random variable $$P$$ from an underlying distribution $$F$$. Recall that under the null hypothesis, the $$p$$-value is distributed $$U[0, 1]$$. Under the alternate hypothesis, the $$p$$-value will come from the some non-uniform (but unknown) distribution. The BH procedure attempts to estimate an empirical distribution $$\hat{F}$$ from the data.
 
-Once $$\hat{F}$$ is computed, we can perform a transcript-by-transcript test where we evaluate if $$p_i \leq \theta$$ for some decision threshold $$\theta$$. From the discussion [last lecture](/Win2018/lectures/lecture17/), we showed how $$\theta$$ can be obtained using the expression
+Once $$\hat{F}$$ is computed, we can perform a transcript-by-transcript test where we evaluate if $$p_i \leq \theta$$ for some decision threshold $$\theta$$. From the discussion [last lecture](/Win2018/lectures/lecture17/), we showed how $$\theta^*$$ can be obtained using the expression
 
 $$ \frac{\pi_0 \theta^*}{\hat{F}(\theta^*)} = \alpha$$
 
@@ -42,9 +45,9 @@ Sorting the $$p_i$$'s, we obtain $$ p_{(1)} < p_{(2)} < \dots < p_{(m)}$$ where 
 	<div class="figcaption">Justifying the decision boundary for the BH procedure.</div>
 </div>
 
-In conclusion, the BH procedure was a significant development in statistics because it says underlines the importance of multiple testing. Multiple testing can be viewed as an advantage of estimating, allowing us to estimate the distribution $$F$$ so that instead of bounding a $$p$$-value, which is the probability we get a wrong discovery given that the null distribution is true, we can instead bound the probability we've made a mistake given that we've committed to a discovery. The latter requires modeling $$F$$, which is a combination of the null and the alternate distributions. We cannot obtain a good estimate of $$F$$ without multiple testing.
+In conclusion, the BH procedure was a significant development in statistics it turns the multiple testing scenario from a nuisance to an advantage. Multiple testing can be viewed as an advantage of estimating, allowing us to estimate the distribution $$F$$ so that instead of bounding a $$p$$-value, which is the probability we get a wrong discovery given that the null distribution is true, we can instead bound the probability we've made a mistake given that we've committed to a discovery. The latter is a more relevant metric, but requires modeling $$F$$, which is a combination of the null and the alternate distributions. We cannot obtain an estimate of $$F$$ without the data from the multiple testing problems. The BH procedure is a special case of the empirical Bayes theory.
 
-### <a id='eb'></a>Empirical Bayes
+#### <a id='da'></a>Replicates in differential analysis
 
 Recall that for differential expression analysis, we need more than one replicate in each condition. Otherwise, we would not be able to estimate variance or standard error (i.e. we would not be able to draw error bars). We obtain estimates for the mean and variances under the two different conditions A and B:
 
@@ -77,11 +80,11 @@ The bigger the difference in means (i.e. the bigger the $$T$$-statistic), the mo
 	<div class="figcaption">Comparing the t-distribution with 2 degrees of freedom (red) to the standard normal distribution (blue).</div>
 </div>
 
-Note that the standard normal has smaller tails. This means that controlling the false positive rate for the $$t$$-distribution is more difficult, and we must use a larger cutoff in order to control the false positive rate. If we knew the variance $$\sigma^2$$, then the distribution of the $$T$$ statistic would be Gaussian (a linear combination of Gaussians is Gaussian):
+Note that the standard normal has smaller tails. This means that controlling the false positive rate for the $$t$$-distribution is more difficult, and we must use a larger cutoff in order to control the false positive rate, thus reducing the power of the test (to detect signal). If we knew the variance $$\sigma^2$$, then the distribution of the $$T$$ statistic would be Gaussian (a linear combination of Gaussians is Gaussian):
 
 $$ \tilde{T} = \frac{\hat{\mu}^A - \hat{\mu}^B}{\sigma}. $$
 
-This highlights how the estimate of the variance dictates how good our test would be. Estimating this quantity introduces a lot of uncertainty in our distribution (hence fattening the tails). As shown in the figure above, having only 3 replicates does not give us a reliable estimate of the variance, resulting in a low-power test. A larger variance estimate results in a smaller $$t$$-statistic. We can take a closer look at how the variance changes as a function of the data for $$n = 2$$:
+This highlights how significant the uncertainty in the variance estimate impacts the testing procedure; an underestimation of the variance results in a larger $$t$$-statistic. We can take a closer look at how the variance changes as a function of the data for $$n = 2$$:
 
 $$ (\hat{\sigma}^A)^2 = (x_1 - \hat{\mu}^A)^2 + (x_1 - \hat{\mu}^B)^2. $$
 
@@ -90,21 +93,21 @@ $$ (\hat{\sigma}^A)^2 = (x_1 - \hat{\mu}^A)^2 + (x_1 - \hat{\mu}^B)^2. $$
 	<div class="figcaption">Variance estimate with respect to the data.</div>
 </div>
 
-Because there is a large probability that $$x_1$$ is small (red area under the curve), our estimate of the variance and therefore the $$T$$ statistic will be poor. As we increase the number of replicates, our performance gets better quickly.
+Because there is a large probability that $$(x_i-\hat{\mu})^2$$ is small (red area under the curve), our estimate of the variance and therefore the $$T$$ statistic will be poor. As we increase the number of replicates, our performance gets better quickly.
 
 <div class="fig figcenter fighighlight">
   <img src="/Win2018/assets/lecture18/tailsthin.png" width="80%">
 	<div class="figcaption">Comparing the t-distribution with varying degrees of freedom (red) to the standard normal distribution (blue) as the number of replicates increases.</div>
 </div>
 
-Empirical Bayes tells us that we can gain power by estimating some statistics associated all the data (i.e. by estimating some global prior using the data). [DESeq](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-10-r106) leverages the information across genes to power a statistical test for differential expression. With 20000 genes, for example, we can plot the variance with respect to the mean. While the estimate for an individual gene may be poor, we can fit some (often parametric) model for all genes. This process is also known as _shrinkage_ because we shrink the points towards our model, resulting in a tightening of the distribution. As shown in the figure, a Poisson model (blue) underestimates the variance in real data while a negative binomial distribution (orange) tends to fit the data better.
+Empirical Bayes tells us that we can gain power by estimating some statistics associated all the data (i.e. by estimating some global prior using the data). [DESeq](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-10-r106) leverages the information across genes to power a statistical test for differential expression. We can have a scatterplot of (sample mean, sample variance) for 20,000 genes. While the estimate for an individual gene may be poor, we can fit some (often parametric) model for all genes. This process is also known as _shrinkage_ because we shrink the points towards our model, resulting in a tightening of the distribution. As shown in the figure, a Poisson model (blue) underestimates the variance in real data while a negative binomial distribution (orange) tends to fit the data better.
 
 <div class="fig figcenter fighighlight">
   <img src="/Win2018/assets/lecture18/deseq.png" width="40%">
 	<div class="figcaption">Modeling the expression across all genes in an RNA-Seq experiment using a Poisson model (purple) and a negative binomial model (orange). DESeq uses the latter model. </div>
 </div>
 
-### <a id='pca'></a>Principal component analysis
+### <a id='scrna'></a>Single-cell RNA-Seq analysis
 
 For the last part of the course, we will discuss various computational problems that arise from single-cell RNA-Seq analysis. A [recent dataset](https://community.10xgenomics.com/t5/10x-Blog/Our-1-3-million-single-cell-dataset-is-ready-to-download/ba-p/276) published by 10x genomics consists of 1.3 millions cells and 28000 genes. Each cell is represented by a 28000-dimensional expression vectors.
 
@@ -121,7 +124,7 @@ We note that several single-cell analysis pipelines exist because the technology
 2. PCA to further reduce the dimension
 3. Clustering the principal components
 
-Principal component analysis (PCA) consists of the following steps:
+_Principal component analysis_ (PCA) consists of the following steps:
 
 1. Estimate the mean vector and covariance matrix ($$K$$ will be size 2000-by-2000 for the above example)
 $$
