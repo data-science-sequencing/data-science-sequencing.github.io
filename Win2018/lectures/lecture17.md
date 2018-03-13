@@ -1,7 +1,7 @@
 ---
 layout: page
 mathjax: true
-permalink: /Win2018/lectures/lecture17_jz/
+permalink: /Win2018/lectures/lecture17/
 ---
 ## Lecture 17: Statistics for High-Dimensional Data
 
@@ -19,7 +19,7 @@ Tuesday 6 March 2018
 
 ### <a id='mt'></a>Multiple testing
 
-For today's lecture, we will continue from where we left off at the end of last Tuesday's lecture. We will go back to talking about bulk RNA-Seq. Recall that this whole procedure can be summarized using the following block diagram:
+For today's lecture, we will continue from where we left off at the end of [lecture 15](/Win2018/lectures/lecture15/). We will go back to talking about bulk RNA-Seq. Recall that this whole procedure can be summarized using the following block diagram:
 
 <div class="fig figcenter fighighlight"> <img src="/Win2018/assets/lecture17/blocks.png" width="80%"> <div class="figcaption">The statistical testing framework for RNA-Seq.</div> </div>
 
@@ -28,13 +28,13 @@ Last time, we discussed the concept of a $$p$$-value where we let $$P_i$$ repres
 1. A $$p$$-value is a random variable
 2. Under the null hypothesis, a $$p$$-value has uniform distribution
 
-We discussed two methods for tackling the _multiple testing_ problem. Let $$V$$ represent the number of false discoveries out of $$m$$ tests (e.g. $$m$$ can represent the number of transcripts).:
+We discussed two methods for tackling the _multiple testing_ problem to determine which of the $$m$$ tests are significant. Let $$V$$ represent the number of false discoveries out of the $$m$$ tests:
 
 1. **Control FWER** (Bonferroni procedure): The family-wise error rate FWER is defined as
 $$Pr( V > 0)$$.
 To control the FWER at 5% (i.e.
 $$ FWER \leq 0.005$$
-), we simply change our rejection threshold from 0.05 to 0.05/$$m$$. This approach is rather conservative, however. Perhaps we are willing to allow a few false positives if we can make several true discoveries.
+), we simply change our rejection threshold from 0.05 to 0.05/$$m$$. This approach is rather conservative, however. Perhaps we are willing to allow a few false discoveries if we can make several true discoveries.
 
 2. **Control FDR** (Benjamini-Hochberg procedure): The false detection rate is defined as
 $$ E\left[\frac{V}{\max(R, 1)} \right]$$
@@ -59,15 +59,11 @@ For the Bonferroni procedure, we consider the hypotheses $$H_1, \dots, H_m$$. Im
 Consider the following set of $$p$$-values obtained from a differential expression test: 0.02, 0.03, 0.035, 0.006, 0.055, 0.047, 0.01, 0.04, 0.015, 0.025.
 
 1. Under the Bonferroni procedure with $$\alpha = 0.05$$, we make discoveries on none of the tests.
-2. Under the BH procedure with $$\alpha = 0.05$$, we make discoveries on the 1st, 2nd, 3rd, 4th, 7th, 8th, 9th, and 10th tests.
+2. Under the BH procedure with $$\alpha = 0.05$$, the first $$p$$-value after sorting that crosses the $$\alpha/m$$ line is 0.04. Therefore we make discoveries on the 1st, 2nd, 3rd, 4th, 7th, 8th, 9th, and 10th tests.
 
 ### <a id='math'></a>Justifying the BH test
 
-The BH-test, while straightforward, seems rather arbitrary at first glance. We will attempt to justify why the BH procedure is indeed valid and controls FDR at $$\alpha$$. For simplicity, we start with just one test. We know that under the null $$H_0$$, $$P \sim U[0, 1]$$ (i.e. the $$p$$-value has a uniform distribution). Under the alternate $$H_1$$, then $$P \sim f_1$$.
-
-[IMAGE of f_1 with theta on horizontal axis, f_1 on vertical axis]
-
-The false discovery rate captures the fraction of times the null is actually true despite being rejected:
+The BH-test, while straightforward, seems rather arbitrary at first glance. We will attempt to justify why the BH procedure is indeed valid and controls FDR at $$\alpha$$. For simplicity, we start with just one test. We know that under the null $$H_0$$, $$P \sim U[0, 1]$$ (i.e. the $$p$$-value has a uniform distribution). Under the alternate $$H_1$$, then $$P \sim f_1$$. The false discovery rate captures the fraction of times the null is actually true despite being rejected:
 
 $$
 \begin{align*}
@@ -98,7 +94,10 @@ $$ \frac{\pi_0 \theta}{\alpha} = F(\theta) $$
 
 has a CDF on the right-hand side and a line with slope $$\pi_0/\alpha$$ on the left-hand side.
 
-[IMAGE of F, a cdf, intersecting with the pi/alpha slope, and an empirical approximation of $$F$$. Indicate the width and height of the stairs]
+<div class="fig figcenter fighighlight">
+  <img src="/Win2018/assets/lecture18/fdr.png" width="40%">
+	<div class="figcaption">Justifying the decision boundary for the BH procedure.</div>
+</div>
 
 While we do not have $$F$$, we have enough samples to compute an empirical approximation of $$F$$. Note that for the empirical approximation, the height of each step is $$1/m$$. The width of the first step is exactly the smallest $$p$$-value. Intuitively, the sorting step of the BH procedure is captured by computing the approximate CDF.
 
