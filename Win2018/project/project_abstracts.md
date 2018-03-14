@@ -4,7 +4,7 @@ mathjax: true
 permalink: /Win2018/project/abstracts
 ---
 
-## EE 372 : Project Abstracts
+## EE 372: Project Abstracts
 
 #### Next-gen Basecallers
 _Andre Cornman and Logan Spear_  
