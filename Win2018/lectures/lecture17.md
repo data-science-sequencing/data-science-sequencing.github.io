@@ -46,7 +46,7 @@ Consider a list of $$p$$-values obtained from a large set of hypothesis tests (e
 
 1. Sort the $$p$$-values in ascending order to obtain $$P_{(1)} \leq P_{(2)} \leq \dots \leq P_{(m)} $$
 
-2. Plot the sorted $$p$$-values and draw a line with slope $$\alpha/m$$. We will reject the null hypothesis for all points before the first crossing of the line by a sorted $$p$$-value
+2. Plot the sorted $$p$$-values and draw a line with slope $$\alpha/m$$. We will reject the null hypothesis for all points before the first crossing of the line of the sorted $$p$$-values from the right
 
 <div class="fig figcenter fighighlight"> <img src="/Win2018/assets/lecture17/bh.png" width="80%"> <div class="figcaption">Benjamini-Hochberg procedure figure borrowed from the PH525x series notes.</div> </div>
 
