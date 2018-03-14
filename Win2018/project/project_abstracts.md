@@ -16,6 +16,11 @@ _Mark Nishimura_
 
 Hi-C-seq is a useful tool for determining the chromosome's three-dimensional conformation in the nucleus. In this work, we attempt to use Hi-C information, in the form of a contact map, to achieve improved long-read assembly. By solving an LP relaxation of the Traveling Salesman Problem, HINGE + Hi-C provides better repeat resolution on simulated data.
 
+#### Calling SNPs from Maternal Cell-Free RNA Sequencing to Inform Prenatal Care
+_Mira Moufarrej_  
+
+Approximately 15 million neonates are born preterm every year worldwide. To date, we are still unaware of what exactly causes spontaneous preterm delivery and more importantly, how we might prevent it.  To address this and to better target future research into the causes of and potential therapies for spontaneous preterm delivery, we must address two conflated questions of origin – maternal tissue and fetal fraction, which furthermore likely change dramatically over gestation.  To answer part of this question and understand where cfRNA transcripts in the blood originated, here, I present progress I have made toward developing statistical methods that identify fetal single nucleotide polymorphisms from total cfRNA.
+
 #### Parallelizing Medoid Calculations through Spark
 _Daniel Hsu and Brijesh Patel_  
 
@@ -33,8 +38,7 @@ _Laura Shen and Po-Hsuan Wei_
 The transcriptome reflects the genes being expressed at any given time since it can vary depending on external environmental conditions. Many genes do not function in isolation, but work in a coordinated fashion with other genes to create complex proteins and other organic molecules required for biological function. Recent work has been done to assess different detection methods to find these gene networks with single-cell data. This project aims to find possible gene networks with single-cell data using different subnetwork detection methods, with corresponding metrics to evaluate the performances.
 
 #### Limitations of Single Cell RNA-Seq in Neuronal Tissues: The Effect of Dissociation on Gene Expression
-
-_Michelle Drews_
+_Michelle Drews_  
 
 With the increasing feasibility and versatility of high throughput sequencing technologies,
 single cell RNA sequencing has arisen as a very popular method in neuroscience for
@@ -60,7 +64,6 @@ indicating that these genes may be driving single cell clustering – not due to
 biological variation, but rather as an artifact of the preparation to single cell sequencing.
 
 #### Single-Cell and Disease: Modeling the Effects of Disease-Induced Transcriptional Changes on Cell Clustering and Classification
-
-_Jacob Blum_
+_Jacob Blum_  
 
 A unifying theme of neurodegeneration is that particular populations of neurons are more susceptible to cell death and degeneration than others. The reasons given for this selective vulnerability center around the notion that some cell types  are better equipped to deal with the cell biological damage associated with neuronal function. It stands to reason that, given the immense heterogeneity of cell types in the central nervous system, single-cell RNA sequencing (scRNAseq) may offer a glimpse into how different cells respond transcriptionally to cell damage. Understanding this heterogeneous response may offer key insights into why certain cells degenerate and not others--and provide the key to understanding and fixing neurodegenerative disease. The major barrier preventing scRNAseq from being used to study neurodegenerative disease is the following--if cells are undergoing a stress response, will it still be possible to reliably determine which cell type they belong to? To answer this question, I have modeled the effects of a generic proteotoxic cell stress on single-cell RNA sequencing data, and subsequently attempted to assign cell labels to these 'perturbed' cells using consensus clustering, and machine-learning support vector machine (SVM) classifier. Here I report that the presence of perturbed cells drastically alters the estimated number of cell clusters by consensus clustering. However, if the number of clusters is determined in the healthy condition and used as a parameter in the perturbed condition, cell label assignment is still exceptionally accurate with consensus clustering. Similarly, the SVM trained on healthy data is able to correctly classify perturbed cells.
