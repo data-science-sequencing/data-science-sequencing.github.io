@@ -6,12 +6,12 @@ permalink: /Win2018/project/abstracts
 
 ## EE 372: Project Abstracts
 
-#### Next-gen Basecallers
+#### Next-generation Basecallers
 _Andre Cornman and Logan Spear_  
 
 Our project was on basecallers for ONT data. When ONT reads were first released, basecalling was done based off of stochastic models involving multiple bases being inside of the pore during each measurement. As discussing in class, for this model, the raw data is first turned into levels, which are supposed to correspond to the presence of a particular context in the pore, and then bases are called using Viterbi. Modern basecallers have made the switch to directly using the raw signal and from using HMM models to Neural Networks (RNN's). Basecallers that employ RNN's typically see a greater accuracy than HMM based basecallers, although, as our results and results of others suggest, the RNN basecallers are very sensitive to the species of DNA that they are trained on.
 
-#### Improved Long-Read Assembly from Hi-C information
+#### Improved Long-Read Assembly from Hi-C Information
 _Mark Nishimura_  
 
 Hi-C-seq is a useful tool for determining the chromosome's three-dimensional conformation in the nucleus. In this work, we attempt to use Hi-C information, in the form of a contact map, to achieve improved long-read assembly. By solving an LP relaxation of the Traveling Salesman Problem, HINGE + Hi-C provides better repeat resolution on simulated data.
@@ -59,7 +59,7 @@ genes were removed from single cell clustering analysis, different clusters were
 indicating that these genes may be driving single cell clustering – not due to inherent
 biological variation, but rather as an artifact of the preparation to single cell sequencing.
 
-#### Single-cell and disease: Modeling the effects of disease-induced transcriptional changes on cell clustering and classification
+#### Single-Cell and Disease: Modeling the Effects of Disease-Induced Transcriptional Changes on Cell Clustering and Classification
 
 _Jacob Blum_
 
