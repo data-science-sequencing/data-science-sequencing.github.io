@@ -4,7 +4,7 @@ mathjax: true
 permalink: /Win2018/project/guidelines
 ---
 
-## EE 372: Project Guidelines and Ideas
+## EE 372 : Project Guidelines and Ideas
 
 Projects for the course should be broadly related to the overarching theme of the class: sequencing. Projects can have a creative (or innovative component) or be expository. We expect expository projects also to have some component involving real data. Up to two students can collaborate on a project. Some datasets may be larger and therefore take longer to process, so start early! Please keep the following dates in mind:
 
