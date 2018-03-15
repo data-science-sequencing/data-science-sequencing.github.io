@@ -6,7 +6,7 @@ permalink: /Win2018/project/abstracts
 
 ## EE 372: Project Abstracts
 
-#### Next-generation Basecallers
+#### Next-generation Next-generation Basecallers
 _Andre Cornman and Logan Spear_  
 
 Our project was on basecallers for ONT data. When ONT reads were first released, basecalling was done based off of stochastic models involving multiple bases being inside of the pore during each measurement. As discussing in class, for this model, the raw data is first turned into levels, which are supposed to correspond to the presence of a particular context in the pore, and then bases are called using Viterbi. Modern basecallers have made the switch to directly using the raw signal and from using HMM models to Neural Networks (RNN's). Basecallers that employ RNN's typically see a greater accuracy than HMM based basecallers, although, as our results and results of others suggest, the RNN basecallers are very sensitive to the species of DNA that they are trained on.
