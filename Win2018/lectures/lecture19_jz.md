@@ -1,7 +1,7 @@
 ---
 layout: page
 mathjax: true
-permalink: /Win2018/lectures/lecture19/
+permalink: /Win2018/lectures/lecture19_jz/
 ---
 ## Lecture 19: Single-Cell RNA-Seq - Clustering
 
