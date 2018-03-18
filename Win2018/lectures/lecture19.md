@@ -160,7 +160,11 @@ In other words, we assume that all points coming from a cluster are
 generated from some Gaussian distribution with a mean $$\mu_j$$ unique
 to that cluster. More explicitly,
 
-$$ f(y; \theta) = \sum_j p_j \frac{1}{(\sqrt{2\pi})^p} \exp \left\{ -\frac{1}{2} \|y-\mu_j\|^2 \right\}$$
+$$ f(y_i; \theta) = \sum_j p_j \frac{1}{(\sqrt{2\pi})^p} \exp \left\{ -\frac{1}{2} \|y_i-\mu_j\|^2 \right\}$$
+
+The density for all $$n$$ points $$y = \{y_1, \cdots, y_n\}$$ is
+
+$$ f(y; \theta) = \prod_{i=1}^n\sum_j p_j \frac{1}{(\sqrt{2\pi})^p} \exp \left\{ -\frac{1}{2} \|y_i-\mu_j\|^2 \right\}$$
 
 The hidden variables are $$\theta = (\mu_1, \dots, \mu_k, p_1, \dots, p_k)\ \ $$.
 Taking a log of $$f$$, we obtain the log likelihood
@@ -168,7 +172,7 @@ Taking a log of $$f$$, we obtain the log likelihood
 $$
 \begin{align*}
 \ell_{\theta}(y) & = \log f(y; \theta) \\
-& = \log \sum_j p_j \frac{-1}{(\sqrt{2\pi})^p} \exp \left\{ \frac{1}{2} \|y-\mu_j\|^2 \right\} \\
+& = \log \prod_{i=1}^n\sum_j p_j \frac{1}{(\sqrt{2\pi})^p} \exp \left\{- \frac{1}{2} \|y_i-\mu_j\|^2 \right\} \\
 & = \sum_{i=1}^n \log\left( \sum_j p_j \frac{1}{(\sqrt{2\pi})^p} \exp \left\{- \frac{1}{2} \|y_i-\mu_j\|^2 \right\} \right)
 \end{align*}
 $$
@@ -179,7 +183,7 @@ $$ \theta_\text{ML} = \max_\theta \log f(Y; \theta). $$
 
 This problem is not convex, and therefore running EM will only give us a locally optimal solution. Running EM will involve the following steps:
 
-**E-step**: fix
+**E-step**: Fix
 
 $$\theta: P(Z | Y; \theta) = \prod_{i=1}^n p(Z_i | Y_i ; \theta)$$
 
@@ -189,7 +193,7 @@ $$P(z_i = j | y_i ; \theta) = \frac{p_i \exp(-\|y_i-\mu_j\|^2)}{\sum_j p_i \exp(
 
 This is easy to compute.
 
-**M-step**: fix
+**M-step**: Fix
 
 $$ P(Z|Y) $$
 
@@ -197,7 +201,7 @@ and compute
 
 $$
 \begin{align*}
-& \max_\theta E_{Z|Y} [\log P(Y, Z; \theta)] \\
+ \max_\theta E_{Z|Y} [\log P(Y, Z; \theta)]
 & = \max_\theta E_{Z|Y} \left[ \sum_{i=1}^n \log \left( \frac{p_{z_i}}{(\sqrt{2\pi})^p} \exp \left\{\frac{-1}{2} \|y_i-\mu_{z_i} \|^2 \right\} \right) \right] \\
 & = \max_\theta E_{Z|Y} \left[ \sum_{i=1}^n \left(\log p_{z_i} - \frac{1}{2} \|y-\mu_{z_i}\|^2 \right) - \log(\sqrt{2\pi}^p) \right].
 \end{align*}
