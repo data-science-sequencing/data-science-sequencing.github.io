@@ -7,7 +7,7 @@ permalink: /Win2018/lectures/lecture19/
 
 Tuesday 13 March 2018
 
-*scribed by Daniel Hsu*
+*scribed by Daniel Hsu and edited by the course staff*
 
 -----------------
 
