@@ -3,7 +3,7 @@ layout: page
 mathjax: true
 permalink: /Win2018/lectures/lecture19/
 ---
-## Lecture 19: Clustering
+## Lecture 19: Single-Cell RNA-Seq - Clustering
 
 Tuesday 13 March 2018
 
@@ -12,210 +12,204 @@ Tuesday 13 March 2018
 -----------------
 
 ### Topics
-1. <a href='#clust'>Introduction</a>
-1. <a href='#kmeans'>K-means</a>
-  - <a href='#kmeansformulation'>K-means formulation</a>
-  - <a href='#kmeansconv'>K-means convergence</a>
-  - <a href='#kmeanscomplex'>K-means time complexity</a>
-1. <a href='#em'>EM</a>
-  - <a href='#model'>Probabilistic Model</a>
-  - <a href='#E'>E-step</a>
-  - <a href='#M'>M-step</a>
-  - <a href='#comp'>Final comparisons between k-means and EM</a>
 
+1. <a href='#clust'>Introduction</a>
+1. <a href='#kmeans'>_K_-means</a>
+1. <a href='#mix'>EM on Gaussian mixture</a>
 
 ### <a id='clust'></a>Introduction
 
-  The clustering problem can be posed as follows: we start with several data points of dimension $$p$$. For the single-cell dataset mentioned last lecture, we had $$n = 1,300,000$$ cells and $$p = 2000$$ after some preprocessing. The goal of clustering is to partition the $$n$$ cells based on some notion of distance.
+The clustering problem can be posed as follows: we start with several data points
+of dimension $$p$$. For the single-cell dataset mentioned last lecture, we had
+$$n = 1,300,000$$ cells and $$p = 2000$$ after some preprocessing.
+The goal of clustering is to partition the $$n$$ cells based on some notion of distance.
 
-  <div class="fig figcenter fighighlight">
-    <img src="/Win2018/assets/lecture18/10x.png" width="80%">
-  	<div class="figcaption">The 10x Genomics 1.3 million cell dataset visualized in 2 dimensions using t-stochastic neighbor embedding and colored based on computed clusters.</div>
-  </div>
+<div class="fig figcenter fighighlight">
+  <img src="/Win2018/assets/lecture18/10x.png" width="80%">
+	<div class="figcaption">The 10x Genomics 1.3 million cell dataset visualized
+  in 2 dimensions using t-stochastic neighbor embedding and colored based on computed clusters.</div>
+</div>
 
-### <a id='kmeans'></a>K-means
 
-We will use K-means to to do clustering of cells. For reference, a typically used dataset of cells we want to cluster based on gene-expression has $n = 1.3$ million data-points and $$p = 28000\ $$ gene expressions.
+### <a id='kmeans'></a>_K_-means
 
-Before we apply a clustering algorithm, we need to define a distance metric. Since our goal is to cluster points that are close together into the same cluster, this depends on how we represent "closeness" with our distance metric.
+For $$K$$-means clustering, distance is defined as
 
-Given a set of points $$G = \{y_1, y_2, y_3, ... , y_n\}$ with $y_i \in \mathbb{R} \  \ $$ one typical distance metric is the squared Euclidean distance ($$\ell_2$$ distance):
+$$\text{dist}(y_1, y_2) = \|y_1-y_2 \|_2^2. $$
 
-$$\text{dist}(y_1, y_2) = ||y_1 - y_2||^2$$
+We define our set of observed points as
+$$G = \{y_1, y_2, \dots, y_n \}, y_i \in \mathbb{R}^p \ \ $$.
+We assume that the true number of clusters is $$K$$, and therefore we want to
+partition $$G$$ into $$K$$ subsets such that
+$$G = G_1 \cup G_2 \cup \dots \cup G_K$$. We note that practically,
+$$K$$ may not be known _a priori_ and therefore one may need to test
+several $$K$$'s. For now, we will assume $$K$$ is known.
+The $$K$$-means formulation is as follows:
 
-And with this distance metric, we will try to group our set of points $$G$$ into $$k$$ clusters (each denoted as $$G_i$$) such that $$G = G_1 \cup G_2 \cup G_3 \cup ... \cup G_k\ $$. We should note that the number of clusters $$k$$ is not always known, especially if we don't have any information about the structure of the data beforehand. Therefore you may want to run an our loop outside of you clustering algorithm that tries to find the optimal number of clusters $$k$$. We won't be discussing this approach in this lecture, and will instead just assume that we are already given a $k$ from our outer loop.
+$$ G_j \rightarrow r_j \in \mathbb{R}^p \text{ (representative or center of } G_j \text{)}. $$
 
-#### <a id='kmeansformulation'></a>K-means formulation
+In other words, we associate each cluster with some representative. We then
+cluster by assigning $$y_i \rightarrow z_i \in \{1, 2, \dots, k\}\ $$, $$z_i$$
+being the label of cluster containing point $$i$$. Thus
+the representative point there is $$r_{z_i}$$.
 
-Each cluster (represented by $$G_j$$ with $$j \in \{1,2,3,...,k\}$$) has a
-representative point
-$$r_j \in \mathbb{R}$$. This can be thought as a center of $$G_j$$. The goal of
-clustering is to assign each point $y_i$ to the cluster label $$Z_i$$
-with $$Z_i \in \{1,2,3,...,k\}$$. In order to find the most optimal label
-assignment for our set of points, we will seek to minimize the error:
 
-$$J = \min_{\{Z_i\}, \{r_j\}}{\sum_{i=1}^{n}||y_i - r_{z_i}||^2}$$
+The $$K$$-means optimization problem can be formally stated as:
 
-Since we see that there is a double minimization in our error expression, we will do iterations of two steps each to minimize this expression.
+$$ J = \min_{\{z_i\}, \{r_j\}} \sum_{i=1}^n \|y_i - r_{z_i}\|^2.$$
 
-Given $$\{r_j\}$$ (centers are fixed), for every $$i$$ we will minimize
-$$||y_i - r_j||^2$$ over $$j$$. That is, we will assign $$y_i$$ to the closet cluster.
+This objective captures how we want to pick the centers $$r_j$$ and cluster
+assignments $$z_i$$ such that the distances from points to assigned cluster
+centers are small. It turns out that this problem is somewhat difficult to
+solve. For one, it's non-convex. This problem is typically solved using an
+iterative approach. Note that we have two sets of variables we are optimizing
+over ($$z_i$$s and $$r_j$$s). Therefore we can fix one set of variables and
+see if we can optimize the other set.
 
-Given $$\{z_i\}$$ (assignments are fixed), we need to compute center of each
-cluster. Let's focus on computing the center of one cluster $$G_j$$,
-since we can apply this same procedure to computing the centers of all other
-clusters as well. So given cluster $$G_j$$, we will need to minimize
-$$\sum_{i\in G_j}||y_i - r||^2$$ over $$r$$ (space of potential
-centers/representative points for our cluster $$j$$). We can express the
-optimal $$r$$ as
+**Optimizing assignments**: Given $$\{r_j\}$$
+(i.e. centers are fixed), how do we find $$\{z_i\}$$? For every
+$$i$$, we can solve the optimization problem
 
-$$r_j^* = \frac{1}{|G_j|}\sum_{i \in G_j}y_i$$
+$$ \min_j \| y_i - r_j \|^2. $$
 
-This can be thought of as the center of mass of cluster $$G_j$$.
+We assign each point $$y_i$$ to the closest center.
 
-So in every step we'll do two calculations (one over
-$$r$$ and one on $$j$$). The iterative algorithm can be thought of as
+**Optimizing centers**: Now, if we are instead given $$ \{z_i\}$$
+(i.e. assignments are fixed), can we optimize over $$r_j$$? Note that the only
+points that contribute to a cluster center $$r_j$$ are those points
+assigned to cluster $$j$$ (i.e. points that end up in $$G_j$$). Again we
+can break up the optimization problem into isolated optimizations
+(one for each cluster $$j$$):
 
-$$r_j^{(0)} \rightarrow z_i^{(0)} \rightarrow r_j^{(1)} \rightarrow z_i^{(1)} \rightarrow r_j^{(2)} \rightarrow z_i^{(2)} \rightarrow ...$$
+$$ \min_r \sum_{i \in G_j} \|y_i - r \|^2. $$
 
-#### <a id='kmeansconv'></a>K-means convergence
+The solution to this problem is the center of mass (i.e. the
+value that minimizes the sum of moments of inertia given that each
+$$y_i$$ is some point mass in a physical system)
 
-One more thing to consider is whether this algorithm will converge. We see that
-in the first step, the total cost will go down. In the second step, we will
-improve the objective found as well. We also know that the error term is always
-positive. So taking all this into account we see that because we are always
-reducing the nonzero error, we must converge to a minimum. Another thing to
-consider is that the initialization of the centers can greatly affect the rate
-of convergence of k-means. There is a good amount of research into how to pick
-initial centers more optimally. We should note that just because k-means
-converges to a minimum, it doesn't mean that it converges to the global minimum.
-There are structures based on the data and initial clusters that might
-force k-means to converge to a local minimum.
+$$ r_j^* = \frac{1}{|G_j|} \sum_{i \in G_j} y_i. $$
 
-#### <a id='kmeanscomplex'></a>K-means time complexity
+We now have a chicken and egg problem. The $$K$$-means algorithm proceeds
+as follows:
 
-When calculating the time complexity of the k-means computation, we
-only really care about the the complexity in terms of the number of points
-$$n$$ because $n$ is typically so much larger than all other quantities.
+$$\{ z_j^{(0)}\} \rightarrow \{r_j^{(0)}\} \rightarrow \{z_j^{(1)}\} \rightarrow \{r_i^{(1)} \} \rightarrow \dots $$
 
-During the first step we see that we need to compute k distances per point, and
-this is linear in the number of points. Since we choose to express complexity
-in terms of $$n$$, we see that this time complexity is $$O(n)$$. During the
-second step we compute the center of mass, which again requires one distance
-computation per point. Thus this time complexity is also $$O(n)$$.
-The total time complexity for a single step of k-means if $$O(n)$$.
+That is it starts from a random assignments of points to clusters and then
+finds the best representative points for this labelling of the points. Then it
+uses the labelling to improve the clusters, and then recompute the labelling.
+It continues in this manner.
 
-If we change the distance measure from the squared Euclidean distance to some
-other measure, does the runtime change from $$O(n)$$ per iteration?
-We recall that the formulate we used for calculating
-$$r^*$$ is tied to using $$\ell_2$$ as the distance measure.
-If you use a different distance measure that requires a more complex
-computation of $$r^*$$, then it maybe not just require one distance
-computation per point. This might cause the time complexity to different
-from $$O(n)$$.
+We are interested in two questions:
 
-### <a id='em'></a>EM
+1. Will this algorithm even converge?
+1. Will this algorithm work for large amounts of data,
+like the $$n$$ and $$p$$ given for the 10x dataset?
 
-We can see that k-means might look similar to the EM algorithm we have talked
-about in previous lectures. K-means is purely an optimization problem,
-while EM requires a probabilistic model.
+Note that for each mini-optimization, we reduce the value of our overall
+objective function. Because the objective is non-negative (as it's the sum of
+squared terms), and because each optimization can only decrease the value of the
+objective, $$K$$-means is guaranteed to converge. Unfortunately,
+it may not necessarily converge to a global optimum. In practice, users tend
+to test a few different initializations and simply pick the best result. Other
+approaches such as [$$K$$-means++](https://en.wikipedia.org/wiki/K-means%2B%2B)
+intelligently chooses initial centers.
 
-In applying EM to clustering, we will first need a generative model.
-This will provide use with a probability of a connection between clusters and
-data-points. More specifically, we can use a Gaussian mixture model. So for
-every $$i$$-th datapoint associated with cluster $$Z_i$$ with
-$$Z_i \in \{1,2,3,...,k\}\ $$ have define
+Intuitively, the computational cost must depend on the number of points
+$$n$$ and the dimension $$d$$.
 
-$$P(Z_i = j) = p_j$$
+- Finding the nearest neighbor for every point requires $$O(nKd)$$ operations,
+since that point needs to be compared to each of the $$K$$ representative
+points.
+- Finding the center of mass also requires $$O(nd)$$ operations, since each
+point is only used once in the computation of one of the centers
 
-as the probability that the $$i$$-th point belongs to cluster $$j$$.
-Now conditioning on $$Z_i = j$$ we say
+Therefore each iteration is linear in $$n$$. In practice, the number of
+iterations required for convergence is typically not too large.
 
-$$Y_i \sim \mathcal{N}(\mu, I)$$ where $$\mu$$ is the mean and $$I$$ is the covariance.
+Importantly, if the distance measure changes (for example, perhaps we are
+interested in
 
-So for example if a point comes from $$\mu_1$$, we can generate some random
-point centered around $$\mu_1$$ based on the above distribution. Therefore
-$$Y_i$$ comes from a mixture of $$k$$ different Gaussians. We should not
-that $$Y_i$$ itself is not a pure Gaussian.
+  $$\text{dist}(y_1, y_2) = |y_1-y_2 | $$
 
-#### <a id='model'></a>Probabilistic Model
+the $$L_1$$ distance, instead of the $$L_2$$ distance given above), then the
+nearest neighbor computation for each point remains $$O(Kd)$$. The computation of
+the center of mass, however, becomes the computation of the
+co-ordinate wise medians of the points in a cluster. Thus it takes
+$$O(nd)$$ operations as well. However for other distances, this might not
+be the case.
 
-We define the model of $$y$$ as
+### <a id='mix'></a>EM on Gaussian mixture
 
-$$f(y;\theta)$$
+This notion of iterative optimization might remind you of a previous algorithm
+we have discussed: expectation maximization (EM). Recall that EM is different,
+however, because EM attempts to solve an optimization problem formulated
+probabilistically. In contrast, $$K$$-means is just an optimization problem
+with no probabilistic interpretation. Therefore to use EM, we need to come up
+with some model describing how the data points are generated.
 
-The means are unknown and the $$p_j$$'s are also unknown
-(how "big" the cluster $$j$$ is). We can encapsulate the unknown parameters in
-$$\theta$$ as
+We can use a _Gaussian mixture model_. Let $$z_i \in \{1, \dots, K\}$$
+represents the cluster assignment of the $$i$$th data point. We can say that
 
-$$\theta = (\mu_1, \mu_2, ... , \mu_k, p_1, p_2, ... , p_k)$$
+$$ P(Z_i = j) = p_j. $$
 
-Now we express a model for a single point $$y_i$$ as
+We assume that conditioned on $$Z_i = j$$, $$Y_i$$ is a
+circular Gaussian
+with mean $$\mu_j$$:
+ $$Y_i \mid Z_i = j \sim N(\mu_j, I) \ \ $$.
+In other words, we assume that all points coming from a cluster are
+generated from some Gaussian distribution with a mean $$\mu_j$$ unique
+to that cluster. More explicitly,
 
-$$f(y;\theta) = \sum_{j}p_j \frac{1}{\left(\sqrt{2\pi}\right)^{p_j}}e^{-\frac{1}{2}||y_i-\mu_j||^2}$$
+$$ f(y; \theta) = \sum_j p_j \frac{1}{(\sqrt{2\pi})^p} \exp \left\{ -\frac{1}{2} \|y-\mu_j\|^2 \right\}$$
 
-The summation over $$j$$ with $$p_j$$ comes from the fact that $$y_i$$ comes
-from each cluster $$j$$ with probability $$p_j$$. Expressing the log likelihood we get
-
-$$\log(f(y_i;\theta)) = \log\left(\sum_{j}p_j \frac{1}{\left(\sqrt{2\pi}\right)^{p_j}}e^{-\frac{1}{2}||y_i-\mu_j||^2}\right)$$
-
-Now to consider all the datapoints we will need to combine all the above models
-for points independently. We want to express $$\log(f(Y, \theta))$$ with
-$$Y = \{y_1, y_2, ... , y_n\}$$. To do this we simply sum the log likelihood
-expressions given above across all $n$ points. Doing so gives us
-
-$$\log(f(Y, \theta)) = \sum_{i=1}^{n}\log\left(\sum_{j}p_j \frac{1}{\left(\sqrt{2\pi}\right)^{p_j}}e^{-\frac{1}{2}||y_i-\mu_j||^2}\right)$$
-
-We see that this is a non-convex function, so if we try to maximize this
-expression over $$\theta$$ we may only reach at local maximum.
-
-#### <a id='E'></a>E-step
-
-For the E-step of the EM algorithm we fix $$\theta$$ to get $$P(Z|Y;\theta)$$
-where $$Z$$ represents all cluster labels of all points and $$Y$$
-represents all the points, assumed to be independently generated.
-
-$$P(Z|Y;\theta) = \prod_{i=1}^{n}P(Z_i|Y_i;\theta)$$
-
-Now with the posterior (soft EM) we have
-
-$$P(Z_i = j|Y_i; \theta) \propto p_j \frac{e^{-||y_i - \mu_j||^2}}{\sum_{j}p_j e^{-||y_i - \mu_j||^2}}$$
-
-The $$p_i$$ term represents how likely cluster $$j$$ is. The fractional with
-the exponentials represented the normalized likelihood of being in a cluster
-$$j$$.
-
-#### <a id='M'></a>M-step
-
-In the M-step we want to commuterise (will chek later..)
-$$\max_{\theta}E_{Z|Y}[\log(P(Y,Z;\theta))]\ \ $$
-when fixing $$P(Z|Y)$$. Now the hidden variable $$Z$$ is exposed and so we no
-longer have a summation. Now we write out the full expression.
+The hidden variables are $$\theta = (\mu_1, \dots, \mu_k, p_1, \dots, p_k)\ \ $$.
+Taking a log of $$f$$, we obtain the log likelihood
 
 $$
 \begin{align*}
-    \max_{\theta}E_{Z|Y}[\log(P(Y,Z;\theta))] &= \max_{\theta}E_{Z|Y}\left[\sum_{i=1}^{n}\log\left(\frac{P_{Z_i}}{(\sqrt{2\pi})^{p_{Z_i}}} e^{-\frac{1}{2}||y_i - u_{Z_i}||^2} \right)]\right] \\
-    &= \max_{\theta} E_{Z|Y} \sum_{i=1}^{n}\left( \log(P_{Z_i}) - \frac{1}{2}||y_i - \mu_{Z_i}||^2 - \log\left((\sqrt{2\pi})^{p_{Z_i}}\right) \right)
+\ell_{\theta}(y) & = \log f(y; \theta) \\
+& = \log \sum_j p_j \frac{-1}{(\sqrt{2\pi})^p} \exp \left\{ \frac{1}{2} \|y-\mu_j\|^2 \right\} \\
+& = \sum_{i=1}^n \log\left( \sum_j p_j \frac{1}{(\sqrt{2\pi})^p} \exp \left\{- \frac{1}{2} \|y_i-\mu_j\|^2 \right\} \right)
 \end{align*}
 $$
 
-Now we can estimate the $$p$$ probabilities. For example if we focus on cluster
-1, each point has a probabilistic assignment to it. We can add all them up in
-each cluster, and normalize by the total to get our estimates. Additionally
-given the probability (soft) of clustering assignments we can say
+Maximizing $$\ell$$ would give us the maximum likelihood value for $$\theta$$:
 
-$$p_s^* \propto \text{total fractional assignments to cluster j summed over all data points}$$
+$$ \theta_\text{ML} = \max_\theta \log f(Y; \theta). $$
 
-and
+This problem is not convex, and therefore running EM will only give us a locally optimal solution. Running EM will involve the following steps:
 
-$$\mu_j^* = \text{weighted average of $y_i$'s}$$
+**E-step**: fix
 
-where the weight is proportional the probability that $$y_i$$ is assigned to
-cluster $$j$$.
+$$\theta: P(Z | Y; \theta) = \prod_{i=1}^n p(Z_i | Y_i ; \theta)$$
 
-#### <a id='comp'></a>Final comparisons between k-means and EM
+Thinking intuitively, given that we have observed a data point $$Y_i$$, we should obtain some posterior distribution of the clusters it could have come from. For example, a point on the boundary between two clusters might be assigned approximately $$1/2$$ probability for coming from either of those clusters. Unlike for the $$K$$-means approach, which makes "hard" assignments (points are assigned completely to a cluster), EM gives us "soft" assignments. Therefore we can compute the posterior using
 
-Though k-means and EM are similar, they are not quite equivalent. For the E step
-the analogy is assigning points to clusters in k-means, but in EM we assign
-points probabilistically to cluster (soft assignment). Another difference
-is that we are not making hard assignments in EM, since we are doing soft EM.
+$$P(z_i = j | y_i ; \theta) = \frac{p_i \exp(-\|y_i-\mu_j\|^2)}{\sum_j p_i \exp(-\|y_i-\mu_j\|^2)}. $$
+
+This is easy to compute.
+
+**M-step**: fix
+
+$$ P(Z|Y) $$
+
+and compute
+
+$$
+\begin{align*}
+& \max_\theta E_{Z|Y} [\log P(Y, Z; \theta)] \\
+& = \max_\theta E_{Z|Y} \left[ \sum_{i=1}^n \log \left( \frac{p_{z_i}}{(\sqrt{2\pi})^p} \exp \left\{\frac{-1}{2} \|y_i-\mu_{z_i} \|^2 \right\} \right) \right] \\
+& = \max_\theta E_{Z|Y} \left[ \sum_{i=1}^n \left(\log p_{z_i} - \frac{1}{2} \|y-\mu_{z_i}\|^2 \right) - \log(\sqrt{2\pi}^p) \right].
+\end{align*}
+$$
+
+Given probabilities for cluster assignments ("soft" assignments),
+
+$$
+\begin{align*}
+p_j^* & \approx \text{ total fractional assignment to cluster }j\text{ summed over all data points} \\
+\mu_j^* & = \text{weighted average of } y_i \text{'s (weight proportional to probability } y_{ij} \text{ is assigned to } j \text{)}
+\end{align*}
+$$
+
+In some sense, perhaps EM is like some soft version of $$K$$-means. The E-step is analogous to the $$K$$-means step of assigning points to clusters, except for EM the points are assigned probabilistically based on the current parameters $$\theta$$. Once the soft assignments are obtained, the parameters can be re-estimated, which is somewhat analogous to recomputing the cluster centroids. Importantly, the $$p_j$$'s were not present for $$K$$-means.
