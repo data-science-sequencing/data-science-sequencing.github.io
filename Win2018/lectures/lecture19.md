@@ -189,7 +189,7 @@ $$\theta: P(Z | Y; \theta) = \prod_{i=1}^n p(Z_i | Y_i ; \theta)$$
 
 Thinking intuitively, given that we have observed a data point $$Y_i$$, we should obtain some posterior distribution of the clusters it could have come from. For example, a point on the boundary between two clusters might be assigned approximately $$1/2$$ probability for coming from either of those clusters. Unlike for the $$K$$-means approach, which makes "hard" assignments (points are assigned completely to a cluster), EM gives us "soft" assignments. Therefore we can compute the posterior using
 
-$$P(z_i = j | y_i ; \theta) = \frac{p_j \exp(-\|y_i-\mu_j\|^2)}{\sum_k p_k \exp(-\|y_i-\mu_k\|^2)}. $$
+$$P(z_i = j | y_i ; \theta) = \frac{p_j \exp(-\|y_i-\mu_j\|^2)}{\sum_{\ell} p_{\ell} \exp(-\|y_i-\mu_{\ell}\|^2)}. $$
 
 This is easy to compute.
 
