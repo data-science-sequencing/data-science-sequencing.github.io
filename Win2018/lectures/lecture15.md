@@ -354,3 +354,7 @@ reasonable data to work with, yay!
 So how do you control FDR to be less than $$5\%$$?  You define a new metric
 and procedure to guarantee that the FDR is less than $$5 \%$$,
 which we will explore next lecture!
+
+---
+
+_This and the next few lectures on differential expression analysis are inspired by a [lecture](https://www.youtube.com/watch?v=ucPBBTjH5EE) of Lior Pachter's in the Computational Genomics Summer School at UCLA in 2017._

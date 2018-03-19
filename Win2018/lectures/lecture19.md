@@ -147,7 +147,7 @@ probabilistically. In contrast, $$K$$-means is just an optimization problem
 with no probabilistic interpretation. Therefore to use EM, we need to come up
 with some model describing how the data points are generated.
 
-We can use a _Gaussian mixture model_. Let $$z_i \in \{1, \dots, K\}$$
+We can use a _Gaussian mixture model_. Let $$Z_i \in \{1, \dots, K\}$$
 represents the cluster assignment of the $$i$$th data point. We can say that
 
 $$ P(Z_i = j) = p_j. $$
@@ -162,18 +162,18 @@ to that cluster. More explicitly,
 
 $$ f(y_i; \theta) = \sum_j p_j \frac{1}{(\sqrt{2\pi})^p} \exp \left\{ -\frac{1}{2} \|y_i-\mu_j\|^2 \right\}$$
 
-The density for all $$n$$ points $$y = \{y_1, \cdots, y_n\}$$ is
+The density for all $$n$$ points $$Y = \{Y_1, \cdots, Y_n\}$$ is
 
-$$ f(y; \theta) = \prod_{i=1}^n\sum_j p_j \frac{1}{(\sqrt{2\pi})^p} \exp \left\{ -\frac{1}{2} \|y_i-\mu_j\|^2 \right\}$$
+$$ f(Y; \theta) = \prod_{i=1}^n\sum_j p_j \frac{1}{(\sqrt{2\pi})^p} \exp \left\{ -\frac{1}{2} \|Y_i-\mu_j\|^2 \right\}$$
 
 The hidden variables are $$\theta = (\mu_1, \dots, \mu_k, p_1, \dots, p_k)\ \ $$.
 Taking a log of $$f$$, we obtain the log likelihood
 
 $$
 \begin{align*}
-\ell_{\theta}(y) & = \log f(y; \theta) \\
-& = \log \prod_{i=1}^n\sum_j p_j \frac{1}{(\sqrt{2\pi})^p} \exp \left\{- \frac{1}{2} \|y_i-\mu_j\|^2 \right\} \\
-& = \sum_{i=1}^n \log\left( \sum_j p_j \frac{1}{(\sqrt{2\pi})^p} \exp \left\{- \frac{1}{2} \|y_i-\mu_j\|^2 \right\} \right)
+\ell_{\theta}(Y) & = \log f(Y; \theta) \\
+& = \log \prod_{i=1}^n\sum_j p_j \frac{1}{(\sqrt{2\pi})^p} \exp \left\{- \frac{1}{2} \|Y_i-\mu_j\|^2 \right\} \\
+& = \sum_{i=1}^n \log\left( \sum_j p_j \frac{1}{(\sqrt{2\pi})^p} \exp \left\{- \frac{1}{2} \|Y_i-\mu_j\|^2 \right\} \right)
 \end{align*}
 $$
 
@@ -189,7 +189,7 @@ $$\theta: P(Z | Y; \theta) = \prod_{i=1}^n p(Z_i | Y_i ; \theta)$$
 
 Thinking intuitively, given that we have observed a data point $$Y_i$$, we should obtain some posterior distribution of the clusters it could have come from. For example, a point on the boundary between two clusters might be assigned approximately $$1/2$$ probability for coming from either of those clusters. Unlike for the $$K$$-means approach, which makes "hard" assignments (points are assigned completely to a cluster), EM gives us "soft" assignments. Therefore we can compute the posterior using
 
-$$P(z_i = j | y_i ; \theta) = \frac{p_j \exp(-\|y_i-\mu_j\|^2)}{\sum_{\ell} p_{\ell} \exp(-\|y_i-\mu_{\ell}\|^2)}. $$
+$$P(Z_i = j | Y_i ; \theta) = \frac{p_j \exp(-\|Y_i-\mu_j\|^2)}{\sum_{\ell} p_{\ell} \exp(-\|Y_i-\mu_{\ell}\|^2)}. $$
 
 This is easy to compute.
 
@@ -202,8 +202,8 @@ and compute
 $$
 \begin{align*}
  \max_\theta E_{Z|Y} [\log P(Y, Z; \theta)]
-& = \max_\theta E_{Z|Y} \left[ \sum_{i=1}^n \log \left( \frac{p_{z_i}}{(\sqrt{2\pi})^p} \exp \left\{\frac{-1}{2} \|y_i-\mu_{z_i} \|^2 \right\} \right) \right] \\
-& = \max_\theta E_{Z|Y} \left[ \sum_{i=1}^n \left(\log p_{z_i} - \frac{1}{2} \|y-\mu_{z_i}\|^2 \right) - \log(\sqrt{2\pi}^p) \right].
+& = \max_\theta E_{Z|Y} \left[ \sum_{i=1}^n \log \left( \frac{p_{Z_i}}{(\sqrt{2\pi})^p} \exp \left\{\frac{-1}{2} \|Y_i-\mu_{Z_i} \|^2 \right\} \right) \right] \\
+& = \max_\theta E_{Z|Y} \left[ \sum_{i=1}^n \left(\log p_{Z_i} - \frac{1}{2} \|Y-\mu_{Z_i}\|^2 \right) - \log(\sqrt{2\pi}^p) \right].
 \end{align*}
 $$
 
@@ -212,7 +212,7 @@ Given probabilities for cluster assignments ("soft" assignments),
 $$
 \begin{align*}
 p_j^* & \approx \text{ total fractional assignment to cluster }j\text{ summed over all data points} \\
-\mu_j^* & = \text{weighted average of } y_i \text{'s (weight proportional to probability } y_{ij} \text{ is assigned to } j \text{)}
+\mu_j^* & = \text{weighted average of } Y_i \text{'s (weight proportional to probability } Y_{ij} \text{ is assigned to } j \text{)}
 \end{align*}
 $$
 
