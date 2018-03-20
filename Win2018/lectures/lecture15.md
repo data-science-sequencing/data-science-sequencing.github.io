@@ -357,4 +357,4 @@ which we will explore next lecture!
 
 ---
 
-_This and the next few lectures on differential expression analysis are inspired by a [lecture](https://www.youtube.com/watch?v=ucPBBTjH5EE) of Lior Pachter's in the Computational Genomics Summer School at UCLA in 2017._
+_This and the next few lectures on differential expression analysis borrow a lot of material from a [lecture](https://www.youtube.com/watch?v=ucPBBTjH5EE) in the Computational Genomics Summer School at UCLA in 2017 by Prof. Lior Pachter of CalTech (and one could say were inspired by it)._

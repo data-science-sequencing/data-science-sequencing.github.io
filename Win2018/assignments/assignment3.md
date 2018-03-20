@@ -8,6 +8,8 @@ permalink: /Win2018/assignments/assignment3/
 posted Wednesday 28 February 2018  
 due Friday 16 March 2018 at 11:59pm
 
+[Solutions](/Win2018/assets/assignment3/ee372_assignment3_solutions/)
+
 **Submission policy**: Report all plots and your code in [this Jupyter notebook](/Win2018/assets/assignment3/ee372_assignment3.ipynb). Print your notebook as a PDF and attach it to the rest of your assignment. Turn in your assignment through [Gradescope](https://gradescope.com/).
 
 ### Question I: Minhashing
