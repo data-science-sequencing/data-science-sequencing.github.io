@@ -48,7 +48,7 @@ $$
 
 Each row and column represents a SNP. $$A_{ij} = 1$$ indicates that
 the two SNPs are in the same community, and $$A_{ij} = -1$$ indicates
-the opposite. $$A_{ij} = -1$$ indicates no measurement.
+the opposite. $$A_{ij} = 0$$ indicates no measurement.
 This adjacency matrix is typically sparse in practice. We
 need roughly $$n \log n$$ reads in order recover the communities ($$n$$
 indicates the number of nodes). Where is the information we want in
